@@ -24,13 +24,23 @@ elseif(UNIX)
     endif()
 endif()
 
+# Find the Boost library
+if (WIN32)
+    if (NOT DEFINED ENV{BOOST_ROOT})
+        message(FATAL_ERROR "BOOST_ROOT enviroment variable not set!")
+    endif()
+    message(STATUS "Found BOOST_ROOT: $ENV{BOOST_ROOT}")
+endif()
+find_package(Boost REQUIRED COMPONENTS system)
+link_directories(${Boost_LIBRARY_DIRS})
+
 # Find the QtWidgets library
 if (WIN32)
     if (NOT DEFINED ENV{QTDIR})
         message(FATAL_ERROR "QTDIR enviroment variable not set!")
     endif()
     message(STATUS "Found QTDIR: $ENV{QTDIR}")
-    set(CMAKE_PREFIX_PATH "$ENV{QTDIR}")
+    set(CMAKE_PREFIX_PATH CMAKE_LIBRARY_PATH "$ENV{QTDIR}")
 endif()
 find_package(Qt5Widgets CONFIG REQUIRED)
 
@@ -43,8 +53,8 @@ target_sources(pdbClient
         "${CMAKE_CURRENT_LIST_DIR}/src/mainwindow.h"
         "${CMAKE_CURRENT_LIST_DIR}/src/mainwindow.ui"
 )
-target_include_directories(pdbClient PUBLIC "src/")
-target_link_libraries(pdbClient Qt5::Core Qt5::Widgets)
+target_include_directories(pdbClient PUBLIC "src/" ${Boost_INCLUDE_DIRS})
+target_link_libraries(pdbClient Qt5::Core Qt5::Widgets ${Boost_LIBRARIES})
 
 # Create a post-build DLL copy command
 add_custom_command(TARGET pdbClient POST_BUILD
