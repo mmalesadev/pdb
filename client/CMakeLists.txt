@@ -44,6 +44,9 @@ if (WIN32)
 endif()
 find_package(Qt5Widgets CONFIG REQUIRED)
 
+# Threads
+find_package(Threads REQUIRED)
+
 # Create main target
 add_executable(pdbClient ${GUI_FLAG} "")
 target_sources(pdbClient
@@ -52,12 +55,18 @@ target_sources(pdbClient
         "${CMAKE_CURRENT_LIST_DIR}/src/mainwindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/mainwindow.h"
         "${CMAKE_CURRENT_LIST_DIR}/src/mainwindow.ui"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBClient.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBClient.h"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBNetwork.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBNetwork.h"
 )
 target_include_directories(pdbClient PUBLIC "src/" ${Boost_INCLUDE_DIRS})
-target_link_libraries(pdbClient Qt5::Core Qt5::Widgets ${Boost_LIBRARIES})
+target_link_libraries(pdbClient Qt5::Core Qt5::Widgets ${Boost_LIBRARIES} Threads::Threads)
 
-# Create a post-build DLL copy command
-add_custom_command(TARGET pdbClient POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${PROJECT_SOURCE_DIR}/libs/${TARGET_SYSTEM}/$<CONFIGURATION>/"
-    $<TARGET_FILE_DIR:pdbClient>)
+if(WIN32)
+    # Create a post-build DLL copy command
+    add_custom_command(TARGET pdbClient POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/libs/${TARGET_SYSTEM}/$<CONFIGURATION>/"
+        $<TARGET_FILE_DIR:pdbClient>)
+endif()

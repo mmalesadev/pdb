@@ -28,10 +28,14 @@ add_executable(pdbServer ${GUI_FLAG} "")
 target_sources(pdbServer
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBServer.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBServer.h"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBApp.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBApp.h"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBNetwork.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/PDBNetwork.h"
         "${CMAKE_CURRENT_LIST_DIR}/src/PDBAudiobook.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/PDBAudiobook.h"
-        "${CMAKE_CURRENT_LIST_DIR}/src/PDBCore.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/PDBCore.h"
 )
 target_include_directories(pdbServer PUBLIC "src/" ${Boost_INCLUDE_DIR})
 target_link_libraries(pdbServer Threads::Threads ${Boost_LIBRARIES})
