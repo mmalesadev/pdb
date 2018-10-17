@@ -3,7 +3,9 @@
 
 class PDBServer
 {
-
+public:
+    void init();
+    void run();
 };
 
 #endif
