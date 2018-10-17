@@ -1,14 +1,26 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(PDBClient& pdbClient, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui_(new Ui::MainWindow),
+    pdbClient_(pdbClient)
 {
-    ui->setupUi(this);
+    ui_->setupUi(this);
+   
+}
+
+void MainWindow::guiConsoleMessage(const std::string& message)
+{
+    ui_->guiConsole->append(QString::fromStdString(message));
+}
+
+void MainWindow::on_actionConnectToServer_triggered()
+{
+    guiConsoleMessage("testMessage");
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete ui_;
 }
