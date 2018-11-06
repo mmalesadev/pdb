@@ -5,7 +5,9 @@
 class PDBNetwork
 {
 public:
+
     void connectToServer(const std::string& ip, const std::string& port);
+
 };
 
 #endif

@@ -16,9 +16,14 @@ void MainWindow::guiConsoleMessage(const std::string& message)
 
 void MainWindow::on_actionConnectToServer_triggered()
 {
-    std::string ip = "192.168.0.11";
-    std::string port = "7171";
-    guiConsoleMessage("Connecting to server: " + ip + ":" + port);
+    QString ipQ = ui_->ipLine->text();                  
+    QString portQ = ui_->portLine->text();
+    
+    // Zamiana z QString na string
+    std::string ip = ipQ.toStdString();
+    std::string port = portQ.toStdString();
+
+    guiConsoleMessage("Connecting to server: " + ip + ":" + port);  //"192.168.0.11" "7171"
     pdbClient_.connectToServer(ip, port);
 }
 
