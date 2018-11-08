@@ -24,6 +24,7 @@ void MainWindow::on_actionConnectToServer_triggered()
     std::string port = portQ.toStdString();
 
     guiConsoleMessage("Connecting to server: " + ip + ":" + port);  //"192.168.0.11" "7171"
+    ui_->connectionStatusLabel->setText("CONNECTED"); // ZMIANA TEKSTU, DO WYWALENIA
     pdbClient_.connectToServer(ip, port);
 }
 

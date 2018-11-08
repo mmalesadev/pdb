@@ -1,32 +1,18 @@
 #include "PDBServer.h"
+#include <thread>
 #include <iostream>
-#include <boost/asio.hpp>
+#include <chrono>
 
 void PDBServer::init()
 {
-
+    pdbNetwork_.init();
 }
 
 void PDBServer::run()
 {
-    using namespace boost::asio::ip;
-
-    try
+    while(true)
     {
-        boost::asio::io_context io_context; 
-        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 7171));
-        while(true)
-        {
-            tcp::socket socket(io_context);
-            acceptor.accept(socket);
-            std::cout << "Client connected\n";
-
-            // boost::system::error_code ignored_error;
-            // boost::asio::write(socket, boost::asio::buffer(message), ignored_error);
-        }
-    }
-    catch(std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
+        std::cout << "Main thread run() function log" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
     }
 }

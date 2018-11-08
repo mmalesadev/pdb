@@ -18,6 +18,6 @@ void PDBNetwork::connectToServer(const std::string& ip, const std::string& port)
     }
     catch(std::exception& e)
     {
-       std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
     }
 }
