@@ -5,7 +5,7 @@
 
 void PDBServer::init()
 {
-    pdbNetwork_.init();
+    //pdbNetwork_.init();
 }
 
 void PDBServer::run()
