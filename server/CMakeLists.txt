@@ -34,10 +34,12 @@ target_sources(pdbServer
         "${CMAKE_CURRENT_LIST_DIR}/src/PDBApp.h"
         "${CMAKE_CURRENT_LIST_DIR}/src/PDBNetwork.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/PDBNetwork.h"
-        "${CMAKE_CURRENT_LIST_DIR}/src/PDBAudiobook.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/src/PDBAudiobook.h"
+        "${CMAKE_CURRENT_LIST_DIR}/src/InputManager.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/InputManager.h"
+        "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/PDBAudiobook.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/PDBAudiobook.h"
 )
-target_include_directories(pdbServer PUBLIC "src/" ${Boost_INCLUDE_DIR})
+target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" ${Boost_INCLUDE_DIR})
 target_link_libraries(pdbServer Threads::Threads ${Boost_LIBRARIES})
 
 if(WIN32)

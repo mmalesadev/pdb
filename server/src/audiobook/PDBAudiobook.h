@@ -3,6 +3,9 @@
 
 class PDBAudiobook
 {
+public:
+    void init();
+    void run();
 
 };
 
