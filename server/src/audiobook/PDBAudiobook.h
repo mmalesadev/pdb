@@ -1,12 +1,12 @@
 #ifndef _PDB_AUDIOBOOK_
 #define _PDB_AUDIOBOOK_
+#include "PDBApp.h"
 
-class PDBAudiobook
+class PDBAudiobook : public PDBApp
 {
 public:
     void init();
-    void run();
-
+    void appLoopFunction();
 };
 
 #endif

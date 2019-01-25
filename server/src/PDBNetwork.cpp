@@ -2,40 +2,34 @@
 #include <iostream>
 #include <boost/asio.hpp>
 
-PDBNetwork::PDBNetwork()
-{
-}
-
-PDBNetwork::~PDBNetwork()
-{
-    if (thread_.joinable()) thread_.join();
-}
-
 void PDBNetwork::init()
 {
-    std::thread thread(&PDBNetwork::run, this);
-    thread_ = std::move(thread);
+    std::cout << "Initialized PDBNetwork.\n";
 }
 
-void PDBNetwork::run()
+void PDBNetwork::appLoopFunction()
 {
     using namespace boost::asio::ip;
 
+    std::cout << "Starting PDBNetwork loop function.\n";
+
     try
     {
-	//boost::asio::io_context io_context; 
-        //tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 7171));
+	//     boost::asio::io_context io_context; 
+    //     tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 7171));
 
-        //tcp::socket socket(io_context);
-        //acceptor.accept(socket);
-        //std::cout << "Client connected\n";
+    //     tcp::socket socket(io_context);
+    //     acceptor.accept(socket);
+    //     std::cout << "Client connected\n";
 
-        // boost::system::error_code ignored_error;
-        // boost::asio::write(socket, boost::asio::buffer(message), ignored_error);
+    //     boost::system::error_code ignored_error;
+    //     boost::asio::write(socket, boost::asio::buffer(message), ignored_error);
         
     }
     catch(std::exception& e)
     {
         std::cerr << e.what() << std::endl;
     }
+
+    std::cout << "Ending PDBNetwork loop function.\n";
 }

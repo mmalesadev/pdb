@@ -5,7 +5,13 @@
 
 void PDBServer::init()
 {
-    //pdbNetwork_.init();
+    apps_.insert(std::make_pair(PdbApps::PDB_NETWORK, std::make_unique<PDBNetwork>()));
+    apps_.insert(std::make_pair(PdbApps::PDB_AUDIOBOOK, std::make_unique<PDBAudiobook>()));
+
+    for (auto& app : apps_)
+    {
+        app.second->start();
+    }
 }
 
 void PDBServer::run()

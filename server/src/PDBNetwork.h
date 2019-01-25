@@ -1,20 +1,12 @@
 #ifndef _PDB_NETWORK_
 #define _PDB_NETWORK_
-#include <thread>
+#include "PDBApp.h"
 
-class PDBNetwork
+class PDBNetwork : public PDBApp
 {
 public:
-    PDBNetwork();
-    virtual ~PDBNetwork();
-
     void init();
-    void run();
-
-
-
-private:
-    std::thread thread_;
+    void appLoopFunction();
 };
 
 #endif

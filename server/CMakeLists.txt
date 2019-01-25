@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7.2)
 
 project(pdbServer)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 # Platform specific variables
 if(WIN32)
@@ -9,19 +9,26 @@ if(WIN32)
         set(TARGET_SYSTEM "win64")
     endif()
 elseif(UNIX)
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(TARGET_SYSTEM "linux64")
+    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(TARGET_SYSTEM "linux32")
     endif()
 endif()
 
+message(STATUS "Target system: ${TARGET_SYSTEM}")
+
 # Find the Boost library
 find_package(Boost REQUIRED COMPONENTS system)
-link_directories(${Boost_LIBRARY_DIRS})
+link_directories(${Boost_LIBRARY_DIRS} )
 
-message(STATUS "BOOST LIB DIRS: ${Boost_LIBRARY_DIRS}")
+message(STATUS "BOOST LIB DIRS: ${Boost_LIBRARY_DIRS}, BOOST LIBS: ${Boost_LIBRARIES}")
 
 # Threads
 find_package(Threads REQUIRED)
+
+# Gainput library
+if (UNIX)
+    set(GAINPUT_LIBRARIES "${PROJECT_SOURCE_DIR}/dll/linux32/libgainput.so")
+endif()
 
 # Create main target
 add_executable(pdbServer ${GUI_FLAG} "")
@@ -39,13 +46,22 @@ target_sources(pdbServer
         "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/PDBAudiobook.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/PDBAudiobook.h"
 )
-target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" ${Boost_INCLUDE_DIR})
-target_link_libraries(pdbServer Threads::Threads ${Boost_LIBRARIES})
+
+set(LINKER_FLAGS)
+if(UNIX)
+    set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11")
+endif()
+
+target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" "lib/gainput/include/" ${Boost_INCLUDE_DIR})
+
+target_link_libraries(pdbServer Threads::Threads ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES} ${LINKER_FLAGS})
 
 if(WIN32)
     # Create a post-build DLL copy command
     add_custom_command(TARGET pdbServer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_SOURCE_DIR}/libs/${TARGET_SYSTEM}/$<CONFIGURATION>/"
+        "${PROJECT_SOURCE_DIR}/dll/${TARGET_SYSTEM}/$<CONFIGURATION>/"
         $<TARGET_FILE_DIR:pdbServer>)
 endif()
+
+# TODO: Add gainput libs and autocopy to /usr/lib or other dir
