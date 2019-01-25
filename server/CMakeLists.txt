@@ -65,5 +65,3 @@ if(WIN32)
         "${PROJECT_SOURCE_DIR}/dll/${TARGET_SYSTEM}/$<CONFIGURATION>/"
         $<TARGET_FILE_DIR:pdbServer>)
 endif()
-
-# TODO: Add gainput libs and autocopy to /usr/lib or other dir
