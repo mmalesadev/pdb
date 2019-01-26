@@ -15,3 +15,9 @@ void PDBAudiobook::appLoopFunction()
    }
    std::cout << "Ending PDBAudiobook loop function.\n";
 }
+
+void playMessage(const std::string & message)
+{
+    std::string milenaMessageCall = "milena_say " + message;
+    system(milenaMessageCall.c_str());
+}
