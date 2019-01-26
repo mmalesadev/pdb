@@ -11,7 +11,8 @@ void InputManager::init()
     std::cout << "Initializing InputManager.\n";
     keyboardId_ = manager_.CreateDevice<gainput::InputDeviceKeyboard>(gainput::InputDevice::AutoIndex, gainput::InputDevice::DV_RAW);
     gainput::InputDevice* device = manager_.GetDevice(keyboardId_);
-    if (device->GetState() == gainput::InputDevice::DeviceState::DS_OK) std::cout << "Keyboard FOUND.\n";
+    if (device->GetState() == gainput::InputDevice::DeviceState::DS_OK) 
+        std::cout << "Keyboard FOUND.\n";
     else
     {
         std::cout << "Keyboard NOT FOUND.\n";
@@ -29,5 +30,7 @@ void InputManager::handlePressedKeys()
     if (map_->GetBoolWasDown(Button::BUTTON_Q))
     {
         std::cout << "Q pressed\n";
+        std::string milenaMessageCall = "milena_say Q pressed";
+        system(milenaMessageCall.c_str());
     }
 }

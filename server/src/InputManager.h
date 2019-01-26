@@ -2,6 +2,7 @@
 #define _INPUT_MANAGER_
 #include <gainput/gainput.h>
 #include <memory>
+#include <unordered_map>
 
 class InputManager
 {
