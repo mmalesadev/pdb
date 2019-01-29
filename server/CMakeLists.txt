@@ -47,11 +47,15 @@ target_sources(pdbServer
         "${CMAKE_CURRENT_LIST_DIR}/src/InputManager.h"
         "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/PDBAudiobook.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/PDBAudiobook.h"
+        "${CMAKE_CURRENT_LIST_DIR}/src/AudioTrack.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/AudioTrack.h"
+        "${CMAKE_CURRENT_LIST_DIR}/src/AudioPlayer.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/AudioPlayer.h"
 )
 
 set(LINKER_FLAGS)
 if(UNIX)
-    set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11")
+    set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11 -lao -lmpg123")
 endif()
 
 target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" "lib/gainput/include/" ${Boost_INCLUDE_DIR})

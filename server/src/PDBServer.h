@@ -6,6 +6,8 @@
 #include "PDBNetwork.h"
 #include "audiobook/PDBAudiobook.h"
 #include "InputManager.h"
+#include "AudioPlayer.h"
+#include "AudioTrack.h"
 
 class PDBServer
 {
