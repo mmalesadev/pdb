@@ -16,8 +16,12 @@ void PDBServer::init()
 
 void PDBServer::run()
 {
+    AudioPlayer audioPlayer;
+    AudioTrack track("powrot-z-gwiazd.mp3");
+    
     while(true)
     {
-        inputManager_.handlePressedKeys();
+        //inputManager_.handlePressedKeys();
+        audioPlayer.run(track);
     }
 }
