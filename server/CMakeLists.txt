@@ -55,7 +55,7 @@ target_sources(pdbServer
 
 set(LINKER_FLAGS)
 if(UNIX)
-    set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11 -lao -lmpg123")
+    set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11")
 endif()
 
 target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" "lib/gainput/include/" ${Boost_INCLUDE_DIR})
