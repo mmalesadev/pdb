@@ -11,7 +11,9 @@ if(WIN32)
         set(TARGET_SYSTEM "win64")
     endif()
 elseif(UNIX)
-    if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(TARGET_SYSTEM "linux64")
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(TARGET_SYSTEM "linux32")
     endif()
 endif()
@@ -29,7 +31,11 @@ find_package(Threads REQUIRED)
 
 # Gainput library
 if (UNIX)
-    set(GAINPUT_LIBRARIES "${PROJECT_SOURCE_DIR}/dll/linux32/libgainput.so")
+    set(GAINPUT_LIBRARIES "${PROJECT_SOURCE_DIR}/dll/${TARGET_SYSTEM}/libgainput.so")
+endif()
+
+if (UNIX)
+    set(RTAUDIO_LIBRARIES "${PROJECT_SOURCE_DIR}/dll/${TARGET_SYSTEM}/librtaudio.so")
 endif()
 
 # Create main target
@@ -55,12 +61,12 @@ target_sources(pdbServer
 
 set(LINKER_FLAGS)
 if(UNIX)
-    set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11")
+    set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11 -lmpg123")
 endif()
 
-target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" "lib/gainput/include/" ${Boost_INCLUDE_DIR})
+target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" "lib/gainput/include/" "lib/rtaudio/include/" ${Boost_INCLUDE_DIR})
 
-target_link_libraries(pdbServer Threads::Threads ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES} ${LINKER_FLAGS})
+target_link_libraries(pdbServer Threads::Threads ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES} ${RTAUDIO_LIBRARIES} ${LINKER_FLAGS})
 
 if(WIN32)
     # Create a post-build DLL copy command
