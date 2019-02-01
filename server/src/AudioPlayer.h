@@ -14,14 +14,11 @@ public:
     AudioPlayer();
     ~AudioPlayer();
 
-    void run(AudioTrack & audioTrack);
+    void playMP3(AudioTrack & track);
+    void playWAV(AudioTrack & track);
 
 private:
-
     void init();
-    void open(AudioTrack & track);
-    void getDecodingFormat();
-    void play();
     void destroy();
 
     std::vector<AudioTrack> tracks_;
