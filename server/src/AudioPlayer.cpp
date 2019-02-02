@@ -29,16 +29,38 @@ int saw(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   return 0;
 }
 
+int mp3Callback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+         double streamTime, RtAudioStreamStatus status, void *userData)
+{
+    return ((AudioPlayer*)userData)->mp3Callback(outputBuffer, inputBuffer, nBufferFrames, streamTime, status);
+}
+
+int AudioPlayer::mp3Callback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+         double streamTime, RtAudioStreamStatus status)
+{
+    while (mpg123_read(mh_, buffer_, buffer_size_, &done_) == MPG123_OK)
+    {
+        unsigned char * buffer = (unsigned char *) outputBuffer;
+        
+        
+        
+        
+        for (int i = 0; i < nBufferFrames; ++i)
+            for(int j = 0; j < channels_; ++j)
+            {
+                
+            }
+        //ao_play(dev_, (char *)buffer_, done_);
+    }
+    return 0;
+}
+
 void AudioPlayer::playMP3(AudioTrack & audioTrack)
 {
     std::string path = "../data/" + audioTrack.getTitle();
     mpg123_open(mh_, path.c_str());
     mpg123_getformat(mh_, &rate_, &channels_, &encoding_);
 
-    while (mpg123_read(mh_, buffer_, buffer_size_, &done_) == MPG123_OK)
-    {
-        //ao_play(dev_, (char *)buffer_, done_);
-    }
     //play();
 }
 

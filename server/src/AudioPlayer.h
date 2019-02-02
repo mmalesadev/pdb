@@ -16,6 +16,8 @@ public:
 
     void playMP3(AudioTrack & track);
     void playWAV(AudioTrack & track);
+    int mp3Callback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+         double streamTime, RtAudioStreamStatus status);
 
 private:
     void init();

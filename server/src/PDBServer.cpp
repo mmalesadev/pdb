@@ -20,7 +20,8 @@ void PDBServer::run()
     AudioTrack track("powrot-z-gwiazd.mp3");
     
     //inputManager_.handlePressedKeys();
-    audioPlayer.playWAV(track);
+    //audioPlayer.playWAV(track);
+    audioPlayer.playMP3(track);
     while(true);
 
 }
