@@ -14,18 +14,22 @@ public:
     AudioPlayer();
     ~AudioPlayer();
 
-    void playMP3(AudioTrack & track);
-    void playWAV(AudioTrack & track);
+    void initMP3(AudioTrack & audioTrack);
+    void initWAV(AudioTrack & audioTrack);
+
+    void playMP3(AudioTrack & audioTrack);
+    void playWAV(AudioTrack & audioTrack);
+    int mp3Callback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+         double streamTime, RtAudioStreamStatus status);
 
 private:
-    void init();
     void destroy();
 
     std::vector<AudioTrack> tracks_;
 
     mpg123_handle * mh_;
-    unsigned char * buffer_;
-    size_t buffer_size_;
+    unsigned char * mp3DecoderOutputBuffer_;
+    size_t mp3DecoderOutputBufferSize;
     size_t done_;
     int err_;
 
@@ -36,6 +40,8 @@ private:
     RtAudio::StreamParameters parameters_;
     unsigned int sampleRate_;
     unsigned int bufferFrames_;
+    
+    unsigned int nPlayedFrames_;
 };
 
 
