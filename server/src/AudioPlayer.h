@@ -5,6 +5,7 @@
 #include "RtAudio.h"
 #include <vector>
 #include <memory>
+#include "soundfile.h"
 
 #define BITS 8
 
@@ -20,6 +21,8 @@ public:
     void playMP3(AudioTrack & audioTrack);
     void playWAV(AudioTrack & audioTrack);
     int mp3Callback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+         double streamTime, RtAudioStreamStatus status);
+    int wavCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
          double streamTime, RtAudioStreamStatus status);
 
 private:

@@ -16,14 +16,19 @@ void PDBServer::init()
 
 void PDBServer::run()
 {
-    AudioTrack track("powrot-z-gwiazd.mp3");
+    //SoundFileRead soundfile;  
+    AudioTrack track("klapsczang.wav");
     AudioPlayer audioPlayerWav, audioPlayerMp3;
-    audioPlayerWav.initWAV(track);
-    audioPlayerMp3.initMP3(track);
+    //audioPlayerWav.initWAV(track);
+    //audioPlayerMp3.initMP3(track);
     
     //inputManager_.handlePressedKeys();
-    audioPlayerWav.playWAV(track);
-    audioPlayerMp3.playMP3(track);
+    //audioPlayerWav.playWAV(track);
+    //audioPlayerMp3.playMP3(track);
+
+    std::string soundFilePath = "../data/klapsczang.wav";
+    SoundFileRead soundfile(soundFilePath.c_str());
+    //std::cout << endl << soundfile.getSamples() << endl;
     while(true);
 
 }

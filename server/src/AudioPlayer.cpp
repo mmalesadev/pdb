@@ -1,6 +1,8 @@
 #include "AudioPlayer.h"
 #include <cstring>
 
+#include <iostream>
+
 AudioPlayer::AudioPlayer()
 {
 }
@@ -59,6 +61,54 @@ int AudioPlayer::mp3Callback(void *outputBuffer, void *inputBuffer, unsigned int
 
     return 0;
 }
+int wavCb(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+         double streamTime, RtAudioStreamStatus status, void *userData)
+{
+    return ((AudioPlayer*)userData)->wavCallback(outputBuffer, inputBuffer, nBufferFrames, streamTime, status);
+}
+
+int AudioPlayer::wavCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+         double streamTime, RtAudioStreamStatus status)
+{
+    // std::string soundFilePath = "../data/klapsczang.wav";
+    // SoundFileRead soundfile(soundFilePath.c_str());
+    // std::cout << endl << soundfile.getSamples() << endl;
+    // int i, channel;
+    // if (soundfile.getBitsPerSample() == 24) 
+    // {
+    //     for (i = 0; i < soundfile.getSamples(); i++) 
+    //     {
+    //         for (channel = 0; channel < soundfile.getChannels(); channel++)
+    //         {
+    //             soundfile.getCurrentSample24Bit(channel);
+    //             soundfile.getCurrentSampleDouble(channel);
+    //         }
+    //         soundfile.incrementSample(); 
+    //     }
+    // } 
+    // else 
+    // {
+    //     for (i = 0; i < soundfile.getSamples(); i++) 
+    //     {
+    //         for (channel = 0; channel < soundfile.getChannels(); channel++) 
+    //         {
+    //             soundfile.getCurrentSample16Bit(channel);
+    //             soundfile.getCurrentSampleDouble(channel);
+
+    //             int16_t* outBuffer = static_cast<int16_t*>(outputBuffer);
+    //             for (int i = 0; i < nBufferFrames; ++i)
+    //             {
+    //                 *outBuffer++ = *(mp3DecoderOutputBuffer + nPlayedFrames_);
+    //                 mp3DecoderOutputBuffer++;
+    //             }
+    //             nPlayedFrames_ += nBufferFrames; 
+    //         }
+    //         soundfile.incrementSample(); 
+    //     }
+    // }
+   
+   return 0;
+}
 
 void AudioPlayer::playMP3(AudioTrack & audioTrack)
 {
@@ -76,12 +126,14 @@ void AudioPlayer::playMP3(AudioTrack & audioTrack)
 void AudioPlayer::playWAV(AudioTrack & audioTrack)
 {
     double data[2];
-    try {
+    try 
+    {
         rtAudio_->openStream(&parameters_, NULL, RTAUDIO_FLOAT64,
-                    sampleRate_, &bufferFrames_, &saw, (void *)&data);
+                    sampleRate_, &bufferFrames_, &wavCb, (void *)&data);
         rtAudio_->startStream();
     }
-    catch (RtAudioError& e) {
+    catch (RtAudioError& e) 
+    {
         e.printMessage();
         exit(0);
     }
@@ -116,7 +168,8 @@ void AudioPlayer::initMP3(AudioTrack & audioTrack)
 void AudioPlayer::initWAV(AudioTrack & audioTrack)
 {
     rtAudio_ = std::make_unique<RtAudio>();
-    if (rtAudio_->getDeviceCount() < 1) {
+    if (rtAudio_->getDeviceCount() < 1) 
+    {
         std::cout << "No audio devices found!\n";
         exit(0);
     }
