@@ -5,7 +5,8 @@
 #include "RtAudio.h"
 #include <vector>
 #include <memory>
-#include "soundfile.h"
+#include "AudioFile.h"
+#include <string>
 
 #define BITS 8
 
@@ -35,7 +36,9 @@ private:
     size_t mp3DecoderOutputBufferSize;
     size_t done_;
     int err_;
+    unsigned int nProcessedSamples_ = 0;
 
+    AudioFile<double> audioFile_;
     int channels_, encoding_;
     long rate_;
 

@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.7.2)
 
-# Test comment
-
 project(pdbServer)
 set(CMAKE_CXX_STANDARD 14)
 
@@ -38,10 +36,6 @@ if (UNIX)
     set(RTAUDIO_LIBRARIES "${PROJECT_SOURCE_DIR}/dll/${TARGET_SYSTEM}/librtaudio.so")
 endif()
 
-if (UNIX)
-    set(SOUNDFILE_LIBRARIES "${PROJECT_SOURCE_DIR}/lib/soundfile/${TARGET_SYSTEM}/libsoundfile.a")
-endif()
-
 # Create main target
 add_executable(pdbServer ${GUI_FLAG} "")
 target_sources(pdbServer
@@ -61,6 +55,8 @@ target_sources(pdbServer
         "${CMAKE_CURRENT_LIST_DIR}/src/AudioTrack.h"
         "${CMAKE_CURRENT_LIST_DIR}/src/AudioPlayer.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/AudioPlayer.h"
+        "${CMAKE_CURRENT_LIST_DIR}/src/AudioFile.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/AudioFile.h"
 )
 
 set(LINKER_FLAGS)
@@ -69,10 +65,10 @@ if(UNIX)
 endif()
 
 target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" "lib/gainput/include/"
-    "lib/rtaudio/include/" "lib/soundfile/include/" ${Boost_INCLUDE_DIR})
+    "lib/rtaudio/include/" "lib/soundfile/include/" "AudioFile/" ${Boost_INCLUDE_DIR})
 
 target_link_libraries(pdbServer Threads::Threads ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES}
-    ${RTAUDIO_LIBRARIES} ${SOUNDFILE_LIBRARIES} ${LINKER_FLAGS})
+    ${RTAUDIO_LIBRARIES} ${LINKER_FLAGS})
 
 if(WIN32)
     # Create a post-build DLL copy command

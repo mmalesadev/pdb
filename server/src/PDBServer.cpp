@@ -2,6 +2,7 @@
 #include <thread>
 #include <iostream>
 #include <chrono>
+#include "AudioFile.h"
 
 void PDBServer::init()
 {
@@ -16,19 +17,17 @@ void PDBServer::init()
 
 void PDBServer::run()
 {
-    //SoundFileRead soundfile;  
+
     AudioTrack track("klapsczang.wav");
     AudioPlayer audioPlayerWav, audioPlayerMp3;
-    //audioPlayerWav.initWAV(track);
+    audioPlayerWav.initWAV(track);
     //audioPlayerMp3.initMP3(track);
     
     //inputManager_.handlePressedKeys();
-    //audioPlayerWav.playWAV(track);
+    audioPlayerWav.playWAV(track);
     //audioPlayerMp3.playMP3(track);
 
-    std::string soundFilePath = "../data/klapsczang.wav";
-    SoundFileRead soundfile(soundFilePath.c_str());
-    //std::cout << endl << soundfile.getSamples() << endl;
+
     while(true);
 
 }
