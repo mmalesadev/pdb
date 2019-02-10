@@ -1,6 +1,8 @@
 #include "AudioPlayer.h"
 #include <cstring>
 
+#include <iostream>
+
 AudioPlayer::AudioPlayer()
 {
 }
@@ -44,7 +46,7 @@ int AudioPlayer::mp3Callback(void *outputBuffer, void *inputBuffer, unsigned int
     {
         nPlayedFrames_ = 0;
         if (mpg123_read(mh_, mp3DecoderOutputBuffer_, mp3DecoderOutputBufferSize, &done_) != MPG123_OK)
-            return 0;
+            return 1;
     }
     
     int16_t* outBuffer = static_cast<int16_t*>(outputBuffer);
@@ -56,6 +58,29 @@ int AudioPlayer::mp3Callback(void *outputBuffer, void *inputBuffer, unsigned int
         mp3DecoderOutputBuffer++;
     }
     nPlayedFrames_ += nBufferFrames; 
+
+    return 0;
+}
+int wavCb(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+         double streamTime, RtAudioStreamStatus status, void *userData)
+{
+    return ((AudioPlayer*)userData)->wavCallback(outputBuffer, inputBuffer, nBufferFrames, streamTime, status);
+}
+
+int AudioPlayer::wavCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+         double streamTime, RtAudioStreamStatus status)
+{
+    double* outBuffer = static_cast<double*>(outputBuffer);
+    if(nProcessedSamples_ >= audioFile_.getNumSamplesPerChannel())
+        return 1;
+    for(int i = 0; i < nBufferFrames; ++i)
+    {
+        for(int j = 0; j < audioFile_.getNumChannels(); ++j)
+        {
+            *outBuffer++ = audioFile_.samples[j][nProcessedSamples_ + i];
+        }
+    }
+    nProcessedSamples_ += nBufferFrames;
 
     return 0;
 }
@@ -75,13 +100,14 @@ void AudioPlayer::playMP3(AudioTrack & audioTrack)
 
 void AudioPlayer::playWAV(AudioTrack & audioTrack)
 {
-    double data[2];
-    try {
+    try 
+    {
         rtAudio_->openStream(&parameters_, NULL, RTAUDIO_FLOAT64,
-                    sampleRate_, &bufferFrames_, &saw, (void *)&data);
+                    sampleRate_, &bufferFrames_, &wavCb, (void *) this);
         rtAudio_->startStream();
     }
-    catch (RtAudioError& e) {
+    catch (RtAudioError& e) 
+    {
         e.printMessage();
         exit(0);
     }
@@ -115,16 +141,23 @@ void AudioPlayer::initMP3(AudioTrack & audioTrack)
 
 void AudioPlayer::initWAV(AudioTrack & audioTrack)
 {
+    std::string path = "../data/" + audioTrack.getTitle();
+    audioFile_.load(path);
+
     rtAudio_ = std::make_unique<RtAudio>();
-    if (rtAudio_->getDeviceCount() < 1) {
+    if (rtAudio_->getDeviceCount() < 1) 
+    {
         std::cout << "No audio devices found!\n";
         exit(0);
     }
     parameters_.deviceId = rtAudio_->getDefaultOutputDevice();
-    parameters_.nChannels = 2;
+    parameters_.nChannels = audioFile_.getNumChannels();
     parameters_.firstChannel = 0;
-    sampleRate_ = 44100;
+    sampleRate_ = audioFile_.getSampleRate();
     bufferFrames_ = 256;
+    std::cout << "\n" << audioFile_.getNumChannels() << "\n" << 
+        audioFile_.getLengthInSeconds() << "\n" << audioFile_.getNumSamplesPerChannel() << "\n";
+    
 }
 
 void AudioPlayer::destroy()

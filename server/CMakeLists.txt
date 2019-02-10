@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.7.2)
 
-# Test comment
-
 project(pdbServer)
 set(CMAKE_CXX_STANDARD 14)
 
@@ -57,6 +55,8 @@ target_sources(pdbServer
         "${CMAKE_CURRENT_LIST_DIR}/src/AudioTrack.h"
         "${CMAKE_CURRENT_LIST_DIR}/src/AudioPlayer.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/src/AudioPlayer.h"
+        "${CMAKE_CURRENT_LIST_DIR}/src/AudioFile.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/src/AudioFile.h"
 )
 
 set(LINKER_FLAGS)
@@ -64,9 +64,11 @@ if(UNIX)
     set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11 -lmpg123")
 endif()
 
-target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" "lib/gainput/include/" "lib/rtaudio/include/" ${Boost_INCLUDE_DIR})
+target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/" "lib/gainput/include/"
+    "lib/rtaudio/include/" "lib/soundfile/include/" "AudioFile/" ${Boost_INCLUDE_DIR})
 
-target_link_libraries(pdbServer Threads::Threads ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES} ${RTAUDIO_LIBRARIES} ${LINKER_FLAGS})
+target_link_libraries(pdbServer Threads::Threads ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES}
+    ${RTAUDIO_LIBRARIES} ${LINKER_FLAGS})
 
 if(WIN32)
     # Create a post-build DLL copy command

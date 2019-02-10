@@ -2,6 +2,7 @@
 #include <thread>
 #include <iostream>
 #include <chrono>
+#include "AudioFile.h"
 
 void PDBServer::init()
 {
@@ -16,14 +17,17 @@ void PDBServer::init()
 
 void PDBServer::run()
 {
-    AudioTrack track("powrot-z-gwiazd.mp3");
+
+    AudioTrack track("klapsczang.wav");
     AudioPlayer audioPlayerWav, audioPlayerMp3;
     audioPlayerWav.initWAV(track);
-    audioPlayerMp3.initMP3(track);
+    //audioPlayerMp3.initMP3(track);
     
     //inputManager_.handlePressedKeys();
     audioPlayerWav.playWAV(track);
-    audioPlayerMp3.playMP3(track);
+    //audioPlayerMp3.playMP3(track);
+
+
     while(true);
 
 }
