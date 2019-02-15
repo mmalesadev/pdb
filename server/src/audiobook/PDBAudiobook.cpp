@@ -1,19 +1,27 @@
 #include "PDBAudiobook.h"
-#include <iostream>
+#include "spdlog/spdlog.h"
+
+PDBAudiobook::PDBAudiobook(AudioManager& audioManager) : audiobookPlayer_(audioManager)
+{
+    spdlog::get("console")->info("Creating PDBAudiobook app.");
+}
 
 void PDBAudiobook::init()
 {
-    std::cout << "Initialized PDBAudiobook.\n";
+    spdlog::get("console")->info("Initialized PDBAudiobook.");
 }
 
 void PDBAudiobook::appLoopFunction()
 {
-   std::cout << "Starting PDBAudiobook loop function.\n";
-   while(true)
-   {
+    spdlog::get("console")->info("Starting PDBAudiobook loop function.");
+    AudioTrack audioTrack("klapsczang.wav");
+    audiobookPlayer_.playAudiobook(audioTrack);
 
-   }
-   std::cout << "Ending PDBAudiobook loop function.\n";
+    while(true)
+    {
+
+    }
+    spdlog::get("console")->info("Ending PDBAudiobook loop function.");
 }
 
 void playMessage(const std::string & message)
