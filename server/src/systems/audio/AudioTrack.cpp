@@ -1,5 +1,5 @@
 #include "AudioTrack.h"
-#include "spdlog/spdlog.h"
+#include <boost/log/trivial.hpp>
 
 AudioTrack::AudioTrack(const std::string & fileName)
 {
@@ -8,7 +8,7 @@ AudioTrack::AudioTrack(const std::string & fileName)
     else if (fileExtension == "wav") format_ = Format::WAV;
     else
     {
-        spdlog::get("console")->error("Unknown file extension");
+        BOOST_LOG_TRIVIAL(error) << "Unknown file extension.";
         exit(0);
     }
     trackName_ = fileName.substr(0, fileName.length() - 4);

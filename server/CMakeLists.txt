@@ -19,7 +19,7 @@ endif()
 message(STATUS "Target system: ${TARGET_SYSTEM}")
 
 # Find the Boost library
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system log)
 link_directories(${Boost_LIBRARY_DIRS} )
 
 message(STATUS "BOOST LIB DIRS: ${Boost_LIBRARY_DIRS}, BOOST LIBS: ${Boost_LIBRARIES}")
@@ -66,9 +66,10 @@ set(PDB_SERVER_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/lib/audiofile/AudioFile.h"
 )
 
+add_compile_options(-DBOOST_LOG_DYN_LINK)
 set(LINKER_FLAGS)
 if(UNIX)
-    set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11 -lmpg123")
+    set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11 -lmpg123 -lboost_log -lboost_log_setup")
 endif()
 
 ### MAIN APP
@@ -80,7 +81,7 @@ target_sources(pdbServer
 )
 
 target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/"
-     "lib/gainput/include/" "lib/rtaudio/include/" "lib/spdlog/" ${Boost_INCLUDE_DIR})
+    "lib/audiofile/" "lib/gainput/include/" "lib/rtaudio/include/" ${Boost_INCLUDE_DIR})
 target_link_libraries(pdbServer Threads::Threads 
     ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES} ${RTAUDIO_LIBRARIES} ${LINKER_FLAGS})
 
@@ -93,7 +94,7 @@ if(WIN32)
 endif()
 
 ### TESTS APP
-option(TESTS "Determines whether to build tests." OFF)
+option(TESTS "Determines whether to build tests." ON)
 if(TESTS)
     enable_testing()
 
@@ -111,7 +112,7 @@ if(TESTS)
     )
 
     target_include_directories(pdbServerTests PUBLIC "src/" "src/audiobook/" 
-        "lib/audiofile/" "lib/gainput/include/" "lib/rtaudio/include/" "lib/catch/" "lib/spdlog/" ${Boost_INCLUDE_DIR})
+        "lib/audiofile/" "lib/gainput/include/" "lib/rtaudio/include/" "lib/catch/" ${Boost_INCLUDE_DIR})
     target_link_libraries(pdbServerTests Threads::Threads 
         ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES} ${RTAUDIO_LIBRARIES} ${LINKER_FLAGS})
 

@@ -1,19 +1,19 @@
 #include "PDBAudiobook.h"
-#include "spdlog/spdlog.h"
+#include <boost/log/trivial.hpp>
 
 PDBAudiobook::PDBAudiobook(AudioManager& audioManager) : audiobookPlayer_(audioManager)
 {
-    spdlog::get("console")->info("Creating PDBAudiobook app.");
+    BOOST_LOG_TRIVIAL(info) << "Creating PDBAudiobook app.";
 }
 
 void PDBAudiobook::init()
 {
-    spdlog::get("console")->info("Initialized PDBAudiobook.");
+    BOOST_LOG_TRIVIAL(info) << "Initialized PDBAudiobook.";
 }
 
 void PDBAudiobook::appLoopFunction()
 {
-    spdlog::get("console")->info("Starting PDBAudiobook loop function.");
+    BOOST_LOG_TRIVIAL(info) << "Starting PDBAudiobook loop function.";
     AudioTrack audioTrack("klapsczang.wav");
     audiobookPlayer_.playAudiobook(audioTrack);
 
@@ -21,7 +21,7 @@ void PDBAudiobook::appLoopFunction()
     {
 
     }
-    spdlog::get("console")->info("Ending PDBAudiobook loop function.");
+    BOOST_LOG_TRIVIAL(info) << "Ending PDBAudiobook loop function.";
 }
 
 void playMessage(const std::string & message)
