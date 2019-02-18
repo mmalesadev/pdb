@@ -1,5 +1,5 @@
 #include "AudiobookPlayer.h"
-#include "spdlog/spdlog.h"
+#include <boost/log/trivial.hpp>
 
 AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager) : audioManager_(audioManager), currentlyPlayedAudioStream_(nullptr)
 {
@@ -8,7 +8,6 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager) : audioManager_(aud
 
 void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
 {
-    // TODO: look at std::optional instead of raw pointer
     if(!currentlyPlayedAudioStream_)
     {
         currentlyPlayedAudioStream_ = audioManager_.playAndGetAudioStream(audioTrack);
@@ -17,7 +16,7 @@ void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
     }
     else
     {
-        spdlog::get("console")->error("Cannot play sound. No available streams left.");
+        BOOST_LOG_TRIVIAL(error) << "Cannot play sound. No available streams left.";
     }
 }
 

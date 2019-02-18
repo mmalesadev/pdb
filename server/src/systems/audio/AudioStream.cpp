@@ -1,12 +1,12 @@
 #include "AudioStream.h"
-#include "spdlog/spdlog.h"
+#include <boost/log/trivial.hpp>
 
 AudioStream::AudioStream()
 {
     rtAudio_ = std::make_unique<RtAudio>();
     int nDevices = rtAudio_->getDeviceCount();
     if (nDevices < 1) {
-        spdlog::get("console")->error("No audio devices found!");
+        BOOST_LOG_TRIVIAL(error) << "No audio devices found!";
         exit(0);
     }
     parameters_.deviceId = rtAudio_->getDefaultOutputDevice();

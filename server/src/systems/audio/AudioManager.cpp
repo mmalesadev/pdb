@@ -1,10 +1,11 @@
 #include "AudioManager.h"
-#include "spdlog/spdlog.h"
+#include <boost/log/trivial.hpp>
 
 AudioManager::AudioManager(const size_t nMp3AudioStreams, const size_t nWavAudioStreams)
 {
-    spdlog::get("console")->info("Creating AudioManager app.");
-    spdlog::get("console")->info("Initializing {} mp3 audio streams and {} wav audio streams.", nMp3AudioStreams, nWavAudioStreams);
+    BOOST_LOG_TRIVIAL(info) << "Creating AudioManager app.";
+    BOOST_LOG_TRIVIAL(info) << "Initializing " << nMp3AudioStreams << " mp3 audio streams and " << 
+        nWavAudioStreams << " wav audio streams.";
     for (int i = 0; i < nMp3AudioStreams; ++i)
         mp3AudioStreams_.push_back(std::make_unique<AudioStreamMp3>());
     for (int i = 0; i < nWavAudioStreams; ++i)
@@ -27,7 +28,7 @@ AudioStream* AudioManager::playAndGetAudioStream(const AudioTrack& audioTrack)
                 { foundStream = stream.get(); break; }
     }
 
-    spdlog::get("console")->info("Playing {}.", audioTrack.getFileName());
+    BOOST_LOG_TRIVIAL(info) << "Playing " << audioTrack.getFileName() << ".";
     if(foundStream) foundStream->play(audioTrack);
     return foundStream;
 }
