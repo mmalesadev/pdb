@@ -1,5 +1,4 @@
-#ifndef _INPUT_MANAGER_
-#define _INPUT_MANAGER_
+#pragma once
 #include <gainput/gainput.h>
 #include <memory>
 #include <unordered_map>
@@ -16,5 +15,3 @@ private:
     gainput::DeviceId keyboardId_;
     std::unique_ptr<gainput::InputMap> map_;
 };
-
-#endif

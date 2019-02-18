@@ -1,17 +1,18 @@
 #include "PDBNetwork.h"
 #include <iostream>
 #include <boost/asio.hpp>
+#include "spdlog/spdlog.h"
 
 void PDBNetwork::init()
 {
-    std::cout << "Initialized PDBNetwork.\n";
+    spdlog::get("console")->info("Initialized PDBNetwork");
 }
 
 void PDBNetwork::appLoopFunction()
 {
     using namespace boost::asio::ip;
 
-    std::cout << "Starting PDBNetwork loop function.\n";
+    spdlog::get("console")->info("Starting PDBNetwork loop function.");
 
     try
     {
@@ -31,5 +32,5 @@ void PDBNetwork::appLoopFunction()
         std::cerr << e.what() << std::endl;
     }
 
-    std::cout << "Ending PDBNetwork loop function.\n";
+    spdlog::get("console")->info("Ending PDBNetwork loop function.");
 }

@@ -1,5 +1,4 @@
-#ifndef _PDB_APP_
-#define _PDB_APP_
+#pragma once
 #include <thread>
 
 class PDBApp
@@ -15,5 +14,3 @@ private:
 private:
     std::thread thread_;
 };
-
-#endif
