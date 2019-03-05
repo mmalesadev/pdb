@@ -32,23 +32,21 @@ void InputManager::init()
     }
     map_ = std::make_unique<gainput::InputMap>(manager_);
 
-    map_->MapBool(Button::BUTTON_Q, keyboardId_, gainput::KeyReturn);
+    map_->MapBool(Button::BUTTON_Q, keyboardId_, gainput::KeyQ);
 
     gainput::DeviceButtonSpec buttonSpec;
     map_->GetMappings(Button::BUTTON_Q, &buttonSpec, 1);
     BOOST_LOG_TRIVIAL(info) << "Initialized InputManager.";
 }
 
-void InputManager::handlePressedKeys()
+void InputManager::update()
 {
     manager_.Update();
-    
-    // if (map_->GetBoolWasDown(Button::BUTTON_Q))
-    // {
-    //     std::cout << "Q pressed\n";
-    //     //std::string milenaMessageCall = "milena_say Q pressed";
-    //     //system(milenaMessageCall.c_str());
-    // }
+}
+
+bool InputManager::isButtonPressed(InputManager::Button button)
+{
+    return map_->GetBoolWasDown(button);
 }
 
 }

@@ -14,8 +14,6 @@ void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
     if(!currentlyPlayedAudioStream_)
     {
         currentlyPlayedAudioStream_ = audioManager_.playAndGetAudioStream(audioTrack);
-        audioManager_.playAndGetAudioStream(audioTrack);
-        audioManager_.playAndGetAudioStream(audioTrack);
     }
     else
     {

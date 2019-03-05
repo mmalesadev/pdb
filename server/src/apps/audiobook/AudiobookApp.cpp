@@ -4,7 +4,7 @@
 namespace Pdb
 {
 
-AudiobookApp::AudiobookApp(AudioManager& audioManager) : audiobookPlayer_(audioManager)
+AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManager) : Pdb::App(inputManager), audiobookPlayer_(audioManager)
 {
     BOOST_LOG_TRIVIAL(info) << "Creating AudiobookApp app.";
 }
@@ -19,7 +19,12 @@ void AudiobookApp::appLoopFunction()
     BOOST_LOG_TRIVIAL(info) << "Starting AudiobookApp loop function.";
     while(true)
     {
-
+        inputManager_.update();
+        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
+        {
+            AudioTrack audiotrack("klapsczang.wav");
+            audiobookPlayer_.playAudiobook(audiotrack);
+        }
     }
     BOOST_LOG_TRIVIAL(info) << "Ending AudiobookApp loop function.";
 }
