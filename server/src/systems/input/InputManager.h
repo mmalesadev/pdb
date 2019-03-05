@@ -9,11 +9,13 @@ namespace Pdb
 class InputManager
 {
 public:
+    enum Button { BUTTON_Q };
+
     InputManager();
     void init();
-    void handlePressedKeys();
+    void update();
+    bool isButtonPressed(InputManager::Button button);
 private:
-    enum Button { BUTTON_Q };
     gainput::InputManager manager_;
     gainput::DeviceId keyboardId_;
     std::unique_ptr<gainput::InputMap> map_;
