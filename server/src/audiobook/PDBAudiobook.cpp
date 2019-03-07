@@ -9,6 +9,7 @@ PDBAudiobook::PDBAudiobook(AudioManager& audioManager, InputManager& inputManage
 
 void PDBAudiobook::init()
 {
+    loadTracks();
     BOOST_LOG_TRIVIAL(info) << "Initialized PDBAudiobook.";
 }
 
@@ -21,15 +22,29 @@ void PDBAudiobook::appLoopFunction()
         inputManager_.update();
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
         {
-            AudioTrack audiotrack("klapsczang.wav");
+            AudioTrack audiotrack("stereo_sound.wav");
             audiobookPlayer_.playAudiobook(audiotrack);
         }
     }
     BOOST_LOG_TRIVIAL(info) << "Ending PDBAudiobook loop function.";
 }
 
-void playMessage(const std::string & message)
+void PDBAudiobook::loadTracks()
 {
-    std::string milenaMessageCall = "milena_say " + message;
-    system(milenaMessageCall.c_str());
+    DIR* d;
+    dirent* dir;
+    std::string fileExtension = "";
+    d = opendir("/home/piotr/Documents/Projects/pdb/server/data/");
+    while ((dir = readdir(d)) != NULL)
+    {
+        std::string trackName(dir->d_name);
+        fileExtension = (trackName.length() > 4) ? trackName.substr(trackName.length() - 3, 3) : "";
+        if (fileExtension == "mp3" || fileExtension == "wav")
+        {
+            AudioTrack audioTrack(trackName);
+            audioTracks_.push_back(audioTrack);
+            BOOST_LOG_TRIVIAL(info) << trackName << " loaded.";
+        }
+    }
+    closedir(d);
 }

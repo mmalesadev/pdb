@@ -13,7 +13,7 @@ void InputManager::init()
 {
     BOOST_LOG_TRIVIAL(info) << "Initializing InputManager.";
     
-    keyboardId_ = manager_.CreateDevice<gainput::InputDeviceKeyboard>(gainput::InputDevice::AutoIndex, gainput::InputDevice::DV_STANDARD);
+    keyboardId_ = manager_.CreateDevice<gainput::InputDeviceKeyboard>(gainput::InputDevice::AutoIndex, gainput::InputDevice::DV_RAW);
 
     gainput::InputDevice* device = manager_.GetDevice(keyboardId_);
     if (device->GetState() == gainput::InputDevice::DeviceState::DS_OK)
