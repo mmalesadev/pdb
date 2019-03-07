@@ -2,6 +2,9 @@
 #include "systems/audio/AudioTrack.h"
 #include "systems/audio/AudioManager.h"
 
+namespace Pdb
+{
+
 class AudiobookPlayer
 {
 public:
@@ -16,3 +19,5 @@ private:
 
     AudioStream* currentlyPlayedAudioStream_;
 };
+
+}

@@ -1,6 +1,9 @@
 #include "AudioStream.h"
 #include <boost/log/trivial.hpp>
 
+namespace Pdb
+{
+
 AudioStream::AudioStream()
 {
     rtAudio_ = std::make_unique<RtAudio>();
@@ -16,4 +19,6 @@ int playCb(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
         double streamTime, RtAudioStreamStatus status, void *userData)
 {
     return ((AudioStream*)userData)->playCallback(outputBuffer, inputBuffer, nBufferFrames, streamTime, status);
+}
+
 }

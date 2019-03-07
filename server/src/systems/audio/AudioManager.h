@@ -9,6 +9,9 @@
 #include "systems/audio/AudioStreamWav.h"
 #include "systems/audio/AudioTrack.h"
 
+namespace Pdb
+{
+
 class AudioManager
 {
 public:
@@ -23,3 +26,5 @@ private:
     std::vector< std::unique_ptr<AudioStreamMp3> > mp3AudioStreams_;
     std::vector< std::unique_ptr<AudioStreamWav> > wavAudioStreams_;
 };
+
+}

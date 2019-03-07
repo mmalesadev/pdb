@@ -1,5 +1,8 @@
 #include "AudioStreamWav.h"
 
+namespace Pdb
+{
+
 AudioStreamWav::AudioStreamWav()
 {
 
@@ -35,4 +38,6 @@ int AudioStreamWav::playCallback(void *outputBuffer, void *inputBuffer, unsigned
     nProcessedSamples_ += nBufferFrames;
 
     return 0;
+}
+
 }

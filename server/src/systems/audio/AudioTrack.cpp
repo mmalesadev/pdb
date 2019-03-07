@@ -1,6 +1,9 @@
 #include "AudioTrack.h"
 #include <boost/log/trivial.hpp>
 
+namespace Pdb
+{
+
 AudioTrack::AudioTrack(const std::string & fileName)
 {
     std::string fileExtension = fileName.substr(fileName.length() - 3, 3);
@@ -17,5 +20,7 @@ AudioTrack::AudioTrack(const std::string & fileName)
 
 AudioTrack::~AudioTrack()
 {
+
+}
 
 }

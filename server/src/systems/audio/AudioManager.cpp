@@ -1,6 +1,9 @@
 #include "AudioManager.h"
 #include <boost/log/trivial.hpp>
 
+namespace Pdb
+{
+
 AudioManager::AudioManager(const size_t nMp3AudioStreams, const size_t nWavAudioStreams)
 {
     BOOST_LOG_TRIVIAL(info) << "Creating AudioManager app.";
@@ -38,4 +41,6 @@ int AudioManager::getFreeMp3AudioStreamCount() const
     return std::count_if(mp3AudioStreams_.begin(), mp3AudioStreams_.end(), 
         [this](auto& stream){ return stream->isAvailable(); }
     );
+}
+
 }
