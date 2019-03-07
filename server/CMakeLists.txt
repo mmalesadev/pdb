@@ -39,12 +39,8 @@ endif()
 # Create sources variables
 set(PDB_SERVER_MAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp")
 set(PDB_SERVER_SOURCES
-    "${CMAKE_CURRENT_LIST_DIR}/src/PDBServer.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/PDBServer.h"
-    "${CMAKE_CURRENT_LIST_DIR}/src/PDBApp.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/PDBApp.h"
-    "${CMAKE_CURRENT_LIST_DIR}/src/PDBNetwork.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/PDBNetwork.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/Server.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/Server.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/input/InputManager.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/input/InputManager.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioManager.cpp"
@@ -57,10 +53,14 @@ set(PDB_SERVER_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioStreamMp3.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioStreamWav.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioStreamWav.h"
-    "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/PDBAudiobook.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/PDBAudiobook.h"
-    "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/AudiobookPlayer.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/audiobook/AudiobookPlayer.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/App.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/App.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/network/NetworkApp.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/network/NetworkApp.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/audiobook/AudiobookApp.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/audiobook/AudiobookApp.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/audiobook/AudiobookPlayer.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/audiobook/AudiobookPlayer.h"
 
     "${CMAKE_CURRENT_LIST_DIR}/lib/audiofile/AudioFile.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/lib/audiofile/AudioFile.h"
@@ -80,8 +80,7 @@ target_sources(pdbServer
         ${PDB_SERVER_SOURCES}
 )
 
-target_include_directories(pdbServer PUBLIC "src/" "src/audiobook/"
-    "lib/audiofile/" "lib/gainput/include/" "lib/rtaudio/include/" ${Boost_INCLUDE_DIR})
+target_include_directories(pdbServer PUBLIC "src/" "lib/audiofile/" "lib/gainput/include/" "lib/rtaudio/include/" ${Boost_INCLUDE_DIR})
 target_link_libraries(pdbServer Threads::Threads 
     ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES} ${RTAUDIO_LIBRARIES} ${LINKER_FLAGS})
 

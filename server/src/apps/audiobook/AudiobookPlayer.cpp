@@ -1,6 +1,9 @@
 #include "AudiobookPlayer.h"
 #include <boost/log/trivial.hpp>
 
+namespace Pdb
+{
+
 AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager) : audioManager_(audioManager), currentlyPlayedAudioStream_(nullptr)
 {
     
@@ -23,4 +26,6 @@ void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
 void AudiobookPlayer::pauseAudiobook()
 {
     
+}
+
 }

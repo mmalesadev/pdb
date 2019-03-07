@@ -3,6 +3,9 @@
 #include <memory>
 #include <unordered_map>
 
+namespace Pdb
+{
+
 class InputManager
 {
 public:
@@ -15,3 +18,5 @@ private:
     gainput::DeviceId keyboardId_;
     std::unique_ptr<gainput::InputMap> map_;
 };
+
+}

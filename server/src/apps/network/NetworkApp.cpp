@@ -1,15 +1,18 @@
-#include "PDBNetwork.h"
+#include "NetworkApp.h"
 #include <iostream>
 #include <boost/log/trivial.hpp>
 
-void PDBNetwork::init()
+namespace Pdb
 {
-    BOOST_LOG_TRIVIAL(info) << "Initialized PDBNetwork";
+
+void NetworkApp::init()
+{
+    BOOST_LOG_TRIVIAL(info) << "Initialized NetworkApp";
 }
 
-void PDBNetwork::appLoopFunction()
+void NetworkApp::appLoopFunction()
 {
-    BOOST_LOG_TRIVIAL(info) << "Starting PDBNetwork loop function.";
+    BOOST_LOG_TRIVIAL(info) << "Starting NetworkApp loop function.";
 
     try
     {
@@ -29,5 +32,7 @@ void PDBNetwork::appLoopFunction()
         BOOST_LOG_TRIVIAL(error) << e.what();
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Ending PDBNetwork loop function.";
+    BOOST_LOG_TRIVIAL(info) << "Ending NetworkApp loop function.";
+}
+
 }

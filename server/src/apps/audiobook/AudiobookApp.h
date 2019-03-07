@@ -1,13 +1,16 @@
 #pragma once
-#include "PDBApp.h"
+#include "apps/App.h"
 #include "systems/audio/AudioManager.h"
-#include "audiobook/AudiobookPlayer.h"
+#include "apps/audiobook/AudiobookPlayer.h"
 #include <cstring>
 
-class PDBAudiobook : public PDBApp
+namespace Pdb
+{
+
+class AudiobookApp : public App
 {
 public:
-    PDBAudiobook(AudioManager& audioManager);
+    AudiobookApp(AudioManager& audioManager);
     void init();
     void appLoopFunction();
 private:
@@ -15,3 +18,5 @@ private:
 
     AudiobookPlayer audiobookPlayer_;
 };
+
+}

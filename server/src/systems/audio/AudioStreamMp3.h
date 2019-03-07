@@ -3,6 +3,9 @@
 #include <mpg123.h>
 #include "systems/audio/AudioStream.h"
 
+namespace Pdb
+{
+
 class AudioStreamMp3 : public AudioStream 
 {
 public:
@@ -24,3 +27,5 @@ private:
 
     unsigned int nPlayedFrames_;
 };
+
+}

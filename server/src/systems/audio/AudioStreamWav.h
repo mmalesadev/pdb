@@ -2,6 +2,9 @@
 #include "systems/audio/AudioStream.h"
 #include "AudioFile.h"
 
+namespace Pdb
+{
+
 class AudioStreamWav : public AudioStream
 {
 public:
@@ -15,3 +18,5 @@ private:
     AudioFile<double> audioFile_;
     unsigned int nProcessedSamples_ = 0;
 };
+
+}

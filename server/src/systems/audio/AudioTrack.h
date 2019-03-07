@@ -2,6 +2,9 @@
 #include <string>
 #include <memory>
 
+namespace Pdb
+{
+
 class AudioTrack
 {
 public:
@@ -19,3 +22,5 @@ private:
     std::string trackName_;
     std::string fileName_;
 };
+
+}

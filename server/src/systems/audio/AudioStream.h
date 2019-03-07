@@ -3,6 +3,9 @@
 #include "RtAudio.h"
 #include "systems/audio/AudioTrack.h"
 
+namespace Pdb
+{
+
 class AudioStream
 {
 public:
@@ -24,3 +27,5 @@ protected:
 
 int playCb(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
         double streamTime, RtAudioStreamStatus status, void *userData);
+
+}

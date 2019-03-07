@@ -1,10 +1,13 @@
 #pragma once
 #include <thread>
 
-class PDBApp
+namespace Pdb
+{
+
+class App
 {
 public:
-    virtual ~PDBApp();
+    virtual ~App();
     void start();
     
 private:
@@ -14,3 +17,5 @@ private:
 private:
     std::thread thread_;
 };
+
+}

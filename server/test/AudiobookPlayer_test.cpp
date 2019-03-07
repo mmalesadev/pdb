@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "audiobook/AudiobookPlayer.h"
+#include "apps/audiobook/AudiobookPlayer.h"
 #include <chrono>
 #include <thread>
 
@@ -8,9 +8,9 @@ SCENARIO("Interacting with audiobook (choosing, playing, pausing, rewinding)")
 {
     GIVEN("Initialized audiobook player and played audiobook")
     {
-        AudioManager audioManager;
-        AudiobookPlayer audiobookPlayer(audioManager);
-        AudioTrack track("powrot-z-gwiazd.mp3");
+        Pdb::AudioManager audioManager;
+        Pdb::AudiobookPlayer audiobookPlayer(audioManager);
+        Pdb::AudioTrack track("powrot-z-gwiazd.mp3");
         audiobookPlayer.playAudiobook(track);
         std::this_thread::sleep_for(std::chrono::seconds(1));
 

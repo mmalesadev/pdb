@@ -1,6 +1,9 @@
 #include "InputManager.h"
 #include <boost/log/trivial.hpp>
 
+namespace Pdb
+{
+
 InputManager::InputManager()
 {
     init();
@@ -46,4 +49,6 @@ void InputManager::handlePressedKeys()
     //     //std::string milenaMessageCall = "milena_say Q pressed";
     //     //system(milenaMessageCall.c_str());
     // }
+}
+
 }

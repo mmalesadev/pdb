@@ -1,5 +1,8 @@
 #include "AudioStreamMp3.h"
 
+namespace Pdb
+{
+
 AudioStreamMp3::AudioStreamMp3()
 {
     mpg123_init();
@@ -57,4 +60,6 @@ int AudioStreamMp3::playCallback(void *outputBuffer, void *inputBuffer, unsigned
     nPlayedFrames_ += nBufferFrames; 
 
     return 0;
+}
+
 }
