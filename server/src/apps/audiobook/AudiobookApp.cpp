@@ -4,9 +4,10 @@
 namespace Pdb
 {
 
-AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManager) : Pdb::App(inputManager), audiobookPlayer_(audioManager)
+AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManager)
+    : Pdb::App(audioManager, inputManager), audiobookPlayer_(audioManager)
 {
-    BOOST_LOG_TRIVIAL(info) << "Creating AudiobookApp app.";
+    BOOST_LOG_TRIVIAL(info) << "Creating AudiobookApp.";
 }
 
 void AudiobookApp::init()

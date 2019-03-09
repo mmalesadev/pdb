@@ -5,6 +5,12 @@
 namespace Pdb
 {
 
+NetworkApp::NetworkApp(AudioManager& audioManager, InputManager& inputManager)
+    : App(audioManager, inputManager)
+{
+    BOOST_LOG_TRIVIAL(info) << "Creating NetworkApp.";
+}
+
 void NetworkApp::init()
 {
     BOOST_LOG_TRIVIAL(info) << "Initialized NetworkApp";

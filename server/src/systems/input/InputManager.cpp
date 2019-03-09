@@ -44,7 +44,7 @@ void InputManager::update()
     manager_.Update();
 }
 
-bool InputManager::isButtonPressed(InputManager::Button button)
+bool InputManager::isButtonPressed(Button button)
 {
     return map_->GetBoolWasDown(button);
 }

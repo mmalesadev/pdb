@@ -14,7 +14,7 @@ public:
     InputManager();
     void init();
     void update();
-    bool isButtonPressed(InputManager::Button button);
+    bool isButtonPressed(Button button);
 private:
     gainput::InputManager manager_;
     gainput::DeviceId keyboardId_;
