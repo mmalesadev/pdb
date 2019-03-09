@@ -1,5 +1,6 @@
 #pragma once
 
+#include "systems/audio/AudioManager.h"
 #include "systems/input/InputManager.h"
 #include <thread>
 
@@ -9,7 +10,7 @@ namespace Pdb
 class App
 {
 public:
-    App(InputManager& inputManager);
+    App(AudioManager& audioManager, InputManager& inputManager);
     virtual ~App();
     void start();
     
@@ -20,5 +21,8 @@ private:
     std::thread thread_;
     
 protected:
+    AudioManager& audioManager_;
     InputManager& inputManager_;
 };
+
+}
