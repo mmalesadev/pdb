@@ -36,14 +36,16 @@ if (UNIX)
     set(RTAUDIO_LIBRARIES "${PROJECT_SOURCE_DIR}/dll/${TARGET_SYSTEM}/librtaudio.so")
 endif()
 
-# AWS Polly
-find_package(AWSSDK REQUIRED COMPONENTS Polly)
+# Amazon Polly
+find_package(AWSSDK REQUIRED COMPONENTS polly)
 
 # Create sources variables
 set(PDB_SERVER_MAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp")
 set(PDB_SERVER_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/src/Server.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/Server.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/Config.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/Config.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/input/InputManager.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/input/InputManager.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioManager.cpp"
@@ -56,6 +58,8 @@ set(PDB_SERVER_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioStreamMp3.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioStreamWav.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioStreamWav.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/systems/voice/VoiceManager.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/systems/voice/VoiceManager.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/apps/App.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/apps/App.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/apps/network/NetworkApp.cpp"
@@ -84,7 +88,7 @@ target_sources(pdbServer
 )
 
 target_include_directories(pdbServer PUBLIC "src/" "lib/audiofile/" "lib/gainput/include/" "lib/rtaudio/include/" ${Boost_INCLUDE_DIR})
-target_link_libraries(pdbServer Threads::Threads 
+target_link_libraries(pdbServer Threads::Threads ${AWSSDK_LINK_LIBRARIES}
     ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES} ${RTAUDIO_LIBRARIES} ${LINKER_FLAGS})
 
 if(WIN32)
@@ -96,7 +100,7 @@ if(WIN32)
 endif()
 
 ### TESTS APP
-option(TESTS "Determines whether to build tests." ON)
+option(TESTS "Determines whether to build tests." OFF)
 if(TESTS)
     enable_testing()
 
@@ -113,9 +117,10 @@ if(TESTS)
             ${PDB_SERVER_SOURCES}
     )
 
-    target_include_directories(pdbServerTests PUBLIC "src/" "src/audiobook/" 
-        "lib/audiofile/" "lib/gainput/include/" "lib/rtaudio/include/" "lib/catch/" ${Boost_INCLUDE_DIR})
-    target_link_libraries(pdbServerTests Threads::Threads 
+    
+    target_include_directories(pdbServer PUBLIC "src/" "lib/audiofile/" "lib/gainput/include/" "lib/rtaudio/include/"
+        "lib/catch/" ${Boost_INCLUDE_DIR})
+    target_link_libraries(pdbServer Threads::Threads ${AWSSDK_LINK_LIBRARIES}
         ${Boost_LIBRARIES} ${GAINPUT_LIBRARIES} ${RTAUDIO_LIBRARIES} ${LINKER_FLAGS})
 
     add_test(NAME TestPdbServer COMMAND pdbServerTests)

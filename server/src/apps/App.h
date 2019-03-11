@@ -2,6 +2,7 @@
 
 #include "systems/audio/AudioManager.h"
 #include "systems/input/InputManager.h"
+#include "systems/voice/VoiceManager.h"
 #include <thread>
 
 namespace Pdb
@@ -10,7 +11,7 @@ namespace Pdb
 class App
 {
 public:
-    App(AudioManager& audioManager, InputManager& inputManager);
+    App(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager);
     virtual ~App();
     void start();
     
@@ -23,6 +24,7 @@ private:
 protected:
     AudioManager& audioManager_;
     InputManager& inputManager_;
+    VoiceManager& voiceManager_;
 };
 
 }

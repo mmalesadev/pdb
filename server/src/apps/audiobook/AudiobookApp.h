@@ -11,7 +11,7 @@ namespace Pdb
 class AudiobookApp : public App
 {
 public:
-    AudiobookApp(AudioManager& audioManager, InputManager& inputManager);
+    AudiobookApp(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager);
     void init();
     void appLoopFunction();
 
