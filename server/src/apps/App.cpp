@@ -3,8 +3,8 @@
 namespace Pdb
 {
 
-App::App(AudioManager& audioManager, InputManager& inputManager)
-    : audioManager_(audioManager), inputManager_(inputManager)
+App::App(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager)
+    : audioManager_(audioManager), inputManager_(inputManager), voiceManager_(voiceManager)
 {
 
 }

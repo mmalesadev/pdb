@@ -4,8 +4,8 @@
 namespace Pdb
 {
 
-AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManager)
-    : Pdb::App(audioManager, inputManager), audiobookPlayer_(audioManager)
+AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager)
+    : Pdb::App(audioManager, inputManager, voiceManager), audiobookPlayer_(audioManager)
 {
     BOOST_LOG_TRIVIAL(info) << "Creating AudiobookApp.";
 }
@@ -13,6 +13,7 @@ AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManage
 void AudiobookApp::init()
 {
     BOOST_LOG_TRIVIAL(info) << "Initialized AudiobookApp.";
+    voiceManager_.synthesizeVoiceMessage("Test message", "../data/synthesized_sounds/audiobook_titles", "test_message");
 }
 
 void AudiobookApp::appLoopFunction()

@@ -5,8 +5,8 @@
 namespace Pdb
 {
 
-NetworkApp::NetworkApp(AudioManager& audioManager, InputManager& inputManager)
-    : App(audioManager, inputManager)
+NetworkApp::NetworkApp(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager)
+    : App(audioManager, inputManager, voiceManager)
 {
     BOOST_LOG_TRIVIAL(info) << "Creating NetworkApp.";
 }
@@ -27,7 +27,7 @@ void NetworkApp::appLoopFunction()
 
     //     tcp::socket socket(io_context);
     //     acceptor.accept(socket);
-    //     std::cout << "Client connected\n";
+    //     BOOST_LOG_TRIVIAL(info) << "Client connected\n";
 
     //     boost::system::error_code ignored_error;
     //     boost::asio::write(socket, boost::asio::buffer(message), ignored_error);

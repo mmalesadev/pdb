@@ -7,7 +7,7 @@ namespace Pdb
 class NetworkApp : public App
 {
 public:
-    NetworkApp(AudioManager& audioManager, InputManager& inputManager);
+    NetworkApp(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager);
 
     void init();
     void appLoopFunction();
