@@ -36,6 +36,9 @@ if (UNIX)
     set(RTAUDIO_LIBRARIES "${PROJECT_SOURCE_DIR}/dll/${TARGET_SYSTEM}/librtaudio.so")
 endif()
 
+# AWS Polly
+find_package(AWSSDK REQUIRED COMPONENTS Polly)
+
 # Create sources variables
 set(PDB_SERVER_MAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/src/main.cpp")
 set(PDB_SERVER_SOURCES
