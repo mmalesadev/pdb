@@ -44,7 +44,8 @@ void VoiceManager::synthesizeVoiceMessage(const std::string& message, const std:
 
         BOOST_LOG_TRIVIAL(info) << "Done!";
     }
-    else{
+    else
+    {
         BOOST_LOG_TRIVIAL(error) << "Speech synthesis failed.";
         BOOST_LOG_TRIVIAL(error) << "Error: " << result.GetError().GetMessage();
 	}
