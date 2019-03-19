@@ -10,7 +10,7 @@ AudioStreamWav::AudioStreamWav()
 
 void AudioStreamWav::play(const AudioTrack& audioTrack)
 {
-    std::string path = "../data/" + audioTrack.getFileName();
+    std::string path = audioTrack.getFilePath();
     audioFile_.load(path);
     parameters_.nChannels = audioFile_.getNumChannels();
     parameters_.firstChannel = 0;

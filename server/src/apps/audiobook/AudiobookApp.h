@@ -16,9 +16,10 @@ public:
     void appLoopFunction();
 
 private:
-    std::vector<AudioTrack> audioTracks_;
-
     void loadTracks();
+    void synthesizeTrackTitles();
+
+    std::vector<AudioTrack> audioTracks_;
 
     AudiobookPlayer audiobookPlayer_;
 };

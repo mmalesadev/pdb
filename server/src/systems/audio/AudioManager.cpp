@@ -31,7 +31,7 @@ AudioStream* AudioManager::playAndGetAudioStream(const AudioTrack& audioTrack)
                 { foundStream = stream.get(); break; }
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Playing " << audioTrack.getFileName() << ".";
+    BOOST_LOG_TRIVIAL(info) << "Playing " << audioTrack.getFilePath() << ".";
     if(foundStream) foundStream->play(audioTrack);
     return foundStream;
 }

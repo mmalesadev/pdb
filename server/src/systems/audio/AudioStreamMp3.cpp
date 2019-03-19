@@ -22,7 +22,7 @@ AudioStreamMp3::~AudioStreamMp3()
 
 void AudioStreamMp3::play(const AudioTrack& audioTrack)
 {
-    std::string path = "../data/" + audioTrack.getFileName();
+    std::string path = audioTrack.getFilePath();
     mpg123_open(mh_, path.c_str());
     mpg123_getformat(mh_, &rate_, &channels_, &encoding_);
     nPlayedFrames_ = 0;

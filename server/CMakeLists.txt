@@ -19,7 +19,7 @@ endif()
 message(STATUS "Target system: ${TARGET_SYSTEM}")
 
 # Find the Boost library
-find_package(Boost REQUIRED COMPONENTS system log)
+find_package(Boost REQUIRED COMPONENTS system log filesystem)
 link_directories(${Boost_LIBRARY_DIRS} )
 
 message(STATUS "BOOST LIB DIRS: ${Boost_LIBRARY_DIRS}, BOOST LIBS: ${Boost_LIBRARIES}")
