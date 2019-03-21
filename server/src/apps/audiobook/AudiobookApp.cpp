@@ -2,6 +2,8 @@
 #include <boost/log/trivial.hpp>
 #include <boost/filesystem.hpp>
 
+namespace fs = boost::filesystem;
+
 namespace Pdb
 {
 
@@ -48,7 +50,7 @@ void AudiobookApp::appLoopFunction()
         inputManager_.update();
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
         {
-            AudioTrack audiotrack("../data/klapsczang.wav");
+            AudioTrack audiotrack("../data/audiobooks/stereo_sound.wav");
             audiobookPlayer_.playAudiobook(audiotrack);
         }
     }
@@ -57,24 +59,35 @@ void AudiobookApp::appLoopFunction()
 
 void AudiobookApp::loadTracks()
 {
-    BOOST_LOG_TRIVIAL(info) << "Loading audio tracks.";
-    DIR* d;
-    dirent* dir;
-    std::string fileExtension = "";
     std::string path = "../data/audiobooks/";
-    d = opendir(path.c_str());
-    while ((dir = readdir(d)) != NULL)
+    fs::path p(path);
+    std::string fileExtension = "";
+
+    if (!fs::exists(p))
     {
-        std::string trackName(dir->d_name);
-        fileExtension = (trackName.length() > 4) ? trackName.substr(trackName.length() - 3, 3) : "";
-        if (fileExtension == "mp3" || fileExtension == "wav")
+        BOOST_LOG_TRIVIAL(error) << "Directory with audiobooks not found.";
+        return;
+    }
+
+    if (fs::is_directory(p))
+    {
+        fs::directory_iterator end_iter;
+        for (fs::directory_iterator dir_itr(p); dir_itr != end_iter; ++dir_itr)
         {
-            AudioTrack audioTrack(path + trackName);
-            audioTracks_.push_back(audioTrack);
-            BOOST_LOG_TRIVIAL(info) << audioTrack.getFilePath() << " loaded.";
+            if (fs::is_regular_file(dir_itr->status()))
+            {
+                std::string trackName(dir_itr->path().filename().c_str());
+                fileExtension = (trackName.length() > 4) ? trackName.substr(trackName.length() - 3, 3) : "";
+
+                if (fileExtension == "mp3" || fileExtension == "wav")
+                {
+                    AudioTrack audioTrack(path + trackName);
+                    audioTracks_.push_back(audioTrack);
+                    BOOST_LOG_TRIVIAL(info) << trackName << " loaded.";
+                }
+            }
         }
     }
-    closedir(d);
 }
 
 }

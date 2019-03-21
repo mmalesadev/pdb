@@ -2,7 +2,6 @@
 #include "apps/App.h"
 #include "apps/audiobook/AudiobookPlayer.h"
 #include <cstring>
-#include <dirent.h>
 #include <vector>
 
 namespace Pdb
