@@ -2,7 +2,7 @@
 #include <boost/log/trivial.hpp>
 #include <boost/filesystem.hpp>
 
-namespace fs = boost::filesystem;
+namespace filesystem = boost::filesystem;
 
 namespace Pdb
 {
@@ -59,35 +59,35 @@ void AudiobookApp::appLoopFunction()
 
 void AudiobookApp::loadTracks()
 {
-    std::string path = "../data/audiobooks/";
-    fs::path p(path);
-    std::string fileExtension = "";
+    filesystem::path path(std::string("../data/audiobooks/"));
+    std::string fileExtension;
 
-    if (!fs::exists(p))
+    if (!filesystem::exists(path))
     {
         BOOST_LOG_TRIVIAL(error) << "Directory with audiobooks not found.";
         return;
     }
 
-    if (fs::is_directory(p))
+    if (filesystem::is_directory(path))
     {
-        fs::directory_iterator end_iter;
-        for (fs::directory_iterator dir_itr(p); dir_itr != end_iter; ++dir_itr)
+        filesystem::directory_iterator endIter;
+        for (filesystem::directory_iterator dirItr(path); dirItr != endIter; ++dirItr)
         {
-            if (fs::is_regular_file(dir_itr->status()))
+            if (filesystem::is_regular_file(dirItr->status()))
             {
-                std::string trackName(dir_itr->path().filename().c_str());
+                std::string trackName(dirItr->path().filename().c_str());
                 fileExtension = (trackName.length() > 4) ? trackName.substr(trackName.length() - 3, 3) : "";
 
                 if (fileExtension == "mp3" || fileExtension == "wav")
                 {
-                    AudioTrack audioTrack(path + trackName);
+                    AudioTrack audioTrack("../data/audiobooks/" + trackName);
                     audioTracks_.push_back(audioTrack);
                     BOOST_LOG_TRIVIAL(info) << trackName << " loaded.";
                 }
             }
         }
     }
+    BOOST_LOG_TRIVIAL(info) << audioTracks_.size() << " audio tracks successfully loaded.";
 }
 
 }
