@@ -1,6 +1,5 @@
 #include "AudiobookApp.h"
 #include <boost/log/trivial.hpp>
-#include <boost/filesystem.hpp>
 
 namespace filesystem = boost::filesystem;
 
@@ -8,7 +7,7 @@ namespace Pdb
 {
 
 AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager)
-    : Pdb::App(audioManager, inputManager, voiceManager), audiobookPlayer_(audioManager)
+    : Pdb::App(audioManager, inputManager, voiceManager), audiobookPlayer_(audioManager, voiceManager)
 {
     BOOST_LOG_TRIVIAL(info) << "Creating AudiobookApp.";
 }
@@ -16,30 +15,22 @@ AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManage
 void AudiobookApp::init()
 {
     loadTracks();
-    synthesizeTrackTitles();
+    synthesizeVoiceMessages();
     BOOST_LOG_TRIVIAL(info) << "Initialized AudiobookApp.";
 }
 
-void AudiobookApp::synthesizeTrackTitles()
+void AudiobookApp::synthesizeVoiceMessages()
 {
+    /* Synthesizing lodaded audio track titles e.g. "harry potter" for "harry_potter.mp3" */
     for (auto& audioTrack : audioTracks_)
     {
-        std::string trackName = audioTrack.getTrackName();
-        std::string message = trackName;
+        std::string message = audioTrack.getTrackName();
         std::replace(message.begin(), message.end(), '_', ' ');
-        std::string synthesizedAudiobookTitlesDir = "../data/synthesized_sounds/audiobook_titles";
-        boost::filesystem::path synthesizedAudiobookTitleFile(synthesizedAudiobookTitlesDir + "/" + audioTrack.getTrackName() + ".mp3");
-        if (!boost::filesystem::exists(synthesizedAudiobookTitleFile))
-        {
-            BOOST_LOG_TRIVIAL(info) << "Synthesizing audiobook title for " << trackName << ".\n";
-            voiceManager_.synthesizeVoiceMessage(message, "../data/synthesized_sounds/audiobook_titles", trackName);
-        }
-        else
-        {
-            BOOST_LOG_TRIVIAL(info) << "Audiobook title already synthesized (" << synthesizedAudiobookTitleFile << ").";
-        }
-        
+        voiceManager_.synthesizeVoiceMessage("<speak>" + message + "</speak>", "../data/synthesized_sounds/apps/audiobook/audiobook_titles", audioTrack.getTrackName());
     }
+
+    /* Synthesizing helper messages for blind people e.g. "playing audiobook" */
+    voiceManager_.synthesizeVoiceMessage("<speak>Odtwarzanie książki<break time=\"50ms\"/></speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "playing_audiobook");
 }
 
 void AudiobookApp::appLoopFunction()
@@ -50,9 +41,19 @@ void AudiobookApp::appLoopFunction()
         inputManager_.update();
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
         {
-            AudioTrack audiotrack("../data/audiobooks/stereo_sound.wav");
-            audiobookPlayer_.playAudiobook(audiotrack);
+            audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"));
         }
+
+        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_W))
+        {
+            audioManager_.playAndGetAudioStream(audioTracks_[1]);
+        }
+
+        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_E))
+        {
+            audiobookPlayer_.playAudiobook(audioTracks_[1]);
+        }
+        
     }
     BOOST_LOG_TRIVIAL(info) << "Ending AudiobookApp loop function.";
 }

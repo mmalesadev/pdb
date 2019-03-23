@@ -33,10 +33,7 @@ SCENARIO("Interacting with audiobook (choosing, playing, pausing, rewinding)")
 
             THEN ("Audiobook is paused")
             {
-                REQUIRE ( audiobookPlayer.getCurrentlyPlayedAudioStream() != nullptr );
-                REQUIRE ( audiobookPlayer.getCurrentlyPlayedAudioStream()->isRunning() == false );
             }
         }
-
     }
 }

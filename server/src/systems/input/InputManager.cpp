@@ -33,6 +33,8 @@ void InputManager::init()
     map_ = std::make_unique<gainput::InputMap>(manager_);
 
     map_->MapBool(Button::BUTTON_Q, keyboardId_, gainput::KeyQ);
+    map_->MapBool(Button::BUTTON_W, keyboardId_, gainput::KeyW);
+    map_->MapBool(Button::BUTTON_E, keyboardId_, gainput::KeyE);
 
     gainput::DeviceButtonSpec buttonSpec;
     map_->GetMappings(Button::BUTTON_Q, &buttonSpec, 1);

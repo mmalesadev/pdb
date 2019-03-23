@@ -1,24 +1,24 @@
 #include "AudiobookPlayer.h"
 #include <boost/log/trivial.hpp>
+#include <future>
+#include <memory>
 
 namespace Pdb
 {
 
-AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager) : audioManager_(audioManager), currentlyPlayedAudioStream_(nullptr)
+AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voiceManager) 
+    : audioManager_(audioManager), voiceManager_(voiceManager)
 {
     
 }
 
 void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
 {
-    if(!currentlyPlayedAudioStream_)
-    {
-        currentlyPlayedAudioStream_ = audioManager_.playAndGetAudioStream(audioTrack);
-    }
-    else
-    {
-        BOOST_LOG_TRIVIAL(error) << "Cannot play sound. No available streams left.";
-    }
+    currentlyPlayedAudioStream_ = audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({
+            voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"),
+            voiceManager_.getSynthesizedVoiceAudioTracks().at(audioTrack.getTrackName()),
+            audioTrack
+        }));
 }
 
 void AudiobookPlayer::pauseAudiobook()
