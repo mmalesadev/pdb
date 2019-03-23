@@ -16,7 +16,7 @@ public:
 
 private:
     void loadTracks();
-    void synthesizeTrackTitles();
+    void synthesizeVoiceMessages();
 
     std::vector<AudioTrack> audioTracks_;
 

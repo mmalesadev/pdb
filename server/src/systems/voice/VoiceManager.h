@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <fstream>
+#include <unordered_map>
 
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentialsProviderChain.h>
@@ -15,6 +16,8 @@
 
 #include "Config.h"
 
+#include "systems/audio/AudioTrack.h"
+
 namespace Pdb
 {
     
@@ -24,13 +27,16 @@ public:
     VoiceManager();
     ~VoiceManager();
 
-    void synthesizeVoiceMessage(const std::string& message, const std::string& outputDirectory, const std::string& outputFileName);
+    void synthesizeVoiceMessage(const std::string& message, const std::string& outputDirectory, const std::string& outputTrackName);
+    std::unordered_map<std::string, AudioTrack>& getSynthesizedVoiceAudioTracks() { return synthesizedVoiceAudioTracks_; }
 
 private:
     int GetStreamSize(Aws::IOStream* stream);
     char* GetStreamBytes(Aws::IOStream* stream);
 
     Aws::SDKOptions options_;
+
+    std::unordered_map<std::string, AudioTrack> synthesizedVoiceAudioTracks_;
 };
 
 }
