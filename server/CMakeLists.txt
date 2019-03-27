@@ -79,6 +79,9 @@ if(UNIX)
     set(LINKER_FLAGS ${LINKER_FLAGS} "-lX11 -lmpg123 -lboost_log -lboost_log_setup")
 endif()
 
+# Add logs directory
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/logs")
+
 ### MAIN APP
 add_executable(pdbServer "")
 target_sources(pdbServer
