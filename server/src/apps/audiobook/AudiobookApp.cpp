@@ -1,6 +1,8 @@
 #include "AudiobookApp.h"
 #include <boost/log/trivial.hpp>
 
+#include <boost/filesystem.hpp>
+
 namespace filesystem = boost::filesystem;
 
 namespace Pdb
