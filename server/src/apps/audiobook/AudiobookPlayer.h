@@ -17,6 +17,14 @@ private:
     AudioManager& audioManager_;
     VoiceManager& voiceManager_;
 
+    void loadTracks();
+    void switchToNextAudiobook();
+    void switchToPreviousAudiobook();
+    void playCurrentTrack();
+    int currentIndex_;
+
+    std::vector<AudioTrack> audioTracks_;
+
     std::future<AudioStream*> currentlyPlayedAudioStream_;
 };
 

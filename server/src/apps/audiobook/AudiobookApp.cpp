@@ -11,6 +11,7 @@ namespace Pdb
 AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager)
     : Pdb::App(audioManager, inputManager, voiceManager), audiobookPlayer_(audioManager, voiceManager)
 {
+    this->currentIndex_ = 0;
     BOOST_LOG_TRIVIAL(info) << "Creating AudiobookApp.";
 }
 
@@ -33,64 +34,43 @@ void AudiobookApp::synthesizeVoiceMessages()
 
     /* Synthesizing helper messages for blind people e.g. "playing audiobook" */
     voiceManager_.synthesizeVoiceMessage("<speak>Odtwarzanie książki<break time=\"50ms\"/></speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "playing_audiobook");
+    voiceManager_.synthesizeVoiceMessage("<speak>Wybrano książkę<break time=\"50ms\"/></speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "chosen_audiobook");
 }
 
 void AudiobookApp::appLoopFunction()
 {
     BOOST_LOG_TRIVIAL(info) << "Starting AudiobookApp loop function.";
+
     while(true)
     {
         inputManager_.update();
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
         {
-            audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"));
-        }
-
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_W))
-        {
-            audioManager_.playAndGetAudioStream(audioTracks_[1]);
+            //audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"));
+            this->switchAudiobook('L');
+            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << this->audioTracks_[currentIndex_].getTrackName() << ".";
         }
 
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_E))
         {
-            audiobookPlayer_.playAudiobook(audioTracks_[1]);
+            //audiobookPlayer_.playAudiobook(audioTracks_[1]);
+            this->switchAudiobook('R');
+            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << this->audioTracks_[currentIndex_].getTrackName() << ".";
+        }
+
+        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_W))
+        {
+            BOOST_LOG_TRIVIAL(info) << "Playing " << this->audioTracks_[currentIndex_].getTrackName() << ".";
+            this->playCurrentTrack();
+        }
+
+        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_S))
+        {
+            
         }
         
     }
     BOOST_LOG_TRIVIAL(info) << "Ending AudiobookApp loop function.";
-}
-
-void AudiobookApp::loadTracks()
-{
-    filesystem::path path(std::string("../data/audiobooks/"));
-    std::string fileExtension;
-
-    if (!filesystem::exists(path))
-    {
-        BOOST_LOG_TRIVIAL(error) << "Directory with audiobooks not found.";
-        return;
-    }
-
-    if (filesystem::is_directory(path))
-    {
-        filesystem::directory_iterator endIter;
-        for (filesystem::directory_iterator dirItr(path); dirItr != endIter; ++dirItr)
-        {
-            if (filesystem::is_regular_file(dirItr->status()))
-            {
-                std::string trackName(dirItr->path().filename().c_str());
-                fileExtension = (trackName.length() > 4) ? trackName.substr(trackName.length() - 3, 3) : "";
-
-                if (fileExtension == "mp3" || fileExtension == "wav")
-                {
-                    AudioTrack audioTrack("../data/audiobooks/" + trackName);
-                    audioTracks_.push_back(audioTrack);
-                    BOOST_LOG_TRIVIAL(info) << trackName << " loaded.";
-                }
-            }
-        }
-    }
-    BOOST_LOG_TRIVIAL(info) << audioTracks_.size() << " audio tracks successfully loaded.";
 }
 
 }
