@@ -10,6 +10,8 @@ AudioStreamWav::AudioStreamWav()
 
 void AudioStreamWav::play(const AudioTrack& audioTrack)
 {
+    masterVolume_ = audioTrack.getMasterVolume();
+
     std::string path = audioTrack.getFilePath();
     audioFile_.load(path);
     parameters_.nChannels = audioFile_.getNumChannels();
@@ -22,10 +24,6 @@ void AudioStreamWav::play(const AudioTrack& audioTrack)
     rtAudio_->openStream(&parameters_, NULL, RTAUDIO_FLOAT64,
         sampleRate_, &bufferFrames_, &playCb, (void *) this);
     rtAudio_->startStream();
-}
-
-void AudioStreamWav::close()
-{
 }
 
 int AudioStreamWav::playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,

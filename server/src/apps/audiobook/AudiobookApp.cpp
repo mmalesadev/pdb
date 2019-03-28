@@ -40,15 +40,7 @@ void AudiobookApp::appLoopFunction()
         inputManager_.update();
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
         {
-            //audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"));
             audiobookPlayer_.switchToPreviousAudiobook();
-            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
-        }
-
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_E))
-        {
-            //audiobookPlayer_.playAudiobook(audioTracks_[1]);
-            audiobookPlayer_.switchToNextAudiobook();
             BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
         }
 
@@ -56,8 +48,21 @@ void AudiobookApp::appLoopFunction()
         {
             BOOST_LOG_TRIVIAL(info) << "Playing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
             audiobookPlayer_.playCurrentTrack();
-        }      
+        }
+
+        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_S))
+        {
+            BOOST_LOG_TRIVIAL(info) << "Pausing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+            audiobookPlayer_.pauseCurrentTrack();
+        }
+
+        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_E))
+        {
+            audiobookPlayer_.switchToNextAudiobook();
+            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+        }
     }
+
     BOOST_LOG_TRIVIAL(info) << "Ending AudiobookApp loop function.";
 }
 

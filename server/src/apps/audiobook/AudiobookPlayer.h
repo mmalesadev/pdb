@@ -14,9 +14,9 @@ public:
     void switchToNextAudiobook();
     void switchToPreviousAudiobook();
     void playCurrentTrack();
-    void pauseAudiobook();
+    void pauseCurrentTrack();
 
-    AudioTrack getCurrentTrack()                        { return audioTracks_[currentIndex_]; }
+    AudioTrack getCurrentTrack()                        { return audioTracks_[currentTrackIndex_]; }
     std::vector<AudioTrack> & getAudioTracks()          { return audioTracks_; }
 
 private:
@@ -25,11 +25,10 @@ private:
 
     void loadTracks();
     void playAudiobook(AudioTrack& audioTrack);
-    int currentIndex_;
 
+    int currentTrackIndex_;
     std::vector<AudioTrack> audioTracks_;
-
-    std::future<AudioStream*> currentlyPlayedAudioStream_;
+    AudioStream* currentlyPlayedAudioStream_;
 };
 
 }

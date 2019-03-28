@@ -13,21 +13,23 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
     : audioManager_(audioManager), voiceManager_(voiceManager)
 {
     this->loadTracks();
-    currentIndex_ = 0;
+    currentTrackIndex_ = 0;
 }
 
 void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
 {
+    BOOST_LOG_TRIVIAL(info) << "Playing audiotrack: " << audioTrack.getTrackName() << " (" << audioTrack.getFilePath() << ")";
     currentlyPlayedAudioStream_ = audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({
             voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"),
             voiceManager_.getSynthesizedVoiceAudioTracks().at(audioTrack.getTrackName()),
             audioTrack
-        }));
+        })).get();
 }
 
-void AudiobookPlayer::pauseAudiobook()
+void AudiobookPlayer::pauseCurrentTrack()
 {
-    
+    BOOST_LOG_TRIVIAL(info) << "Pausing audiotrack: " << audioTracks_[currentTrackIndex_].getTrackName();
+    currentlyPlayedAudioStream_->pauseToggle();
 }
 
 void AudiobookPlayer::loadTracks()
@@ -53,7 +55,7 @@ void AudiobookPlayer::loadTracks()
 
                 if (fileExtension == "mp3" || fileExtension == "wav")
                 {
-                    AudioTrack audioTrack("../data/audiobooks/" + trackName);
+                    AudioTrack audioTrack("../data/audiobooks/" + trackName, Config::getInstance().masterVolumeForAudiobooks);
                     audioTracks_.push_back(audioTrack);
                     BOOST_LOG_TRIVIAL(info) << trackName << " loaded.";
                 }
@@ -65,23 +67,23 @@ void AudiobookPlayer::loadTracks()
 
 void AudiobookPlayer::switchToNextAudiobook()
 {
-    if (currentIndex_ == audioTracks_.size() - 1)
-        currentIndex_ = 0;
+    if (currentTrackIndex_ == audioTracks_.size() - 1)
+        currentTrackIndex_ = 0;
     else
-        ++currentIndex_;
+        ++currentTrackIndex_;
 }
 
 void AudiobookPlayer::switchToPreviousAudiobook()
 {
-    if (currentIndex_ == 0)
-        currentIndex_ = audioTracks_.size() - 1;  
+    if (currentTrackIndex_ == 0)
+        currentTrackIndex_ = audioTracks_.size() - 1;  
     else
-        --currentIndex_;
+        --currentTrackIndex_;
 }
 
 void AudiobookPlayer::playCurrentTrack()
 {
-    audioManager_.playAndGetAudioStream(audioTracks_[currentIndex_]);
+    playAudiobook(audioTracks_[currentTrackIndex_]);
 }
 
 }

@@ -13,13 +13,6 @@ AudioStreamMp3::AudioStreamMp3()
     doneDecodingMp3_= false;
 }
 
-void AudioStreamMp3::close()
-{
-    //rtAudio_->closeStream();
-    mpg123_close(mh_);
-    doneDecodingMp3_ = false;
-}
-
 AudioStreamMp3::~AudioStreamMp3()
 {
     free(mp3DecoderOutputBuffer_);
@@ -30,6 +23,8 @@ AudioStreamMp3::~AudioStreamMp3()
 
 void AudioStreamMp3::play(const AudioTrack& audioTrack)
 {
+    masterVolume_ = audioTrack.getMasterVolume();
+
     std::string path = audioTrack.getFilePath();
     mpg123_open(mh_, path.c_str());
     mpg123_getformat(mh_, &rate_, &channels_, &encoding_);
@@ -70,7 +65,7 @@ int AudioStreamMp3::playCallback(void *outputBuffer, void *inputBuffer, unsigned
 
     for (int i = 0; i < nBufferFrames; ++i)
     {
-        *outBuffer++ = *(mp3DecoderOutputBuffer++ + nPlayedFrames_);
+        *outBuffer++ = *(mp3DecoderOutputBuffer++ + nPlayedFrames_) * masterVolume_;
         nDecodedBytesToProcessLeft_ -= 2;
         if (nDecodedBytesToProcessLeft_ == 0) break;
     }
