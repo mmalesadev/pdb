@@ -15,6 +15,20 @@ AudioStream::AudioStream() : paused_(false)
     parameters_.deviceId = rtAudio_->getDefaultOutputDevice();
 }
 
+void AudioStream::pauseToggle()
+{
+    if(paused_)
+    {
+        rtAudio_->startStream();
+        paused_ = false;
+    }
+    else
+    {
+        paused_ = true;
+        rtAudio_->stopStream();
+    }
+}
+
 int playCb(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
         double streamTime, RtAudioStreamStatus status, void *userData)
 {

@@ -3,6 +3,7 @@
 #include "apps/audiobook/AudiobookPlayer.h"
 #include <cstring>
 #include <vector>
+#include "Config.h"
 
 namespace Pdb
 {

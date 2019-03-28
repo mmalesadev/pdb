@@ -13,7 +13,9 @@ Config::Config()
 	catch (std::exception &e)
 	{
 		BOOST_LOG_TRIVIAL(error) << e.what();
-    }
+	}
+	masterVolumeForAwsSynthesized = pt_.get<float>("SynthesizedAudio.masterVolume");
+	masterVolumeForAudiobooks = pt_.get<float>("AudiobookAudio.masterVolume");
 }
 
 

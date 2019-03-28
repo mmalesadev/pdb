@@ -16,9 +16,9 @@ public:
     virtual ~AudioStream() { };
 
     virtual void play(const AudioTrack& audioTrack) = 0;
-    virtual void close() = 0;
     virtual int playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status) = 0;
 
+    void pauseToggle();
     bool isPaused() const { return paused_; }
     bool isAvailable() const { return !rtAudio_->isStreamRunning() && !isPaused(); }
 
@@ -31,6 +31,7 @@ protected:
     unsigned int bufferFrames_;
 
     bool paused_;
+    float masterVolume_;
 
     std::promise<AudioStream*> audioStreamPromise_;
 };

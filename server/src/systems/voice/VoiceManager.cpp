@@ -4,6 +4,8 @@
 
 #include <utility>
 
+#include "Config.h"
+
 namespace Pdb
 {
 
@@ -24,7 +26,7 @@ void VoiceManager::synthesizeVoiceMessage(const std::string& message, const std:
     if (boost::filesystem::exists(synthesizedVoiceMessageFilePath))
     {
         BOOST_LOG_TRIVIAL(info) << "Voice message already synthesized (" << synthesizedVoiceMessageFilePath << ").";
-        synthesizedVoiceAudioTracks_.insert(std::make_pair(outputTrackName, AudioTrack(synthesizedVoiceMessageFilePath.c_str())));
+        synthesizedVoiceAudioTracks_.insert(std::make_pair(outputTrackName, AudioTrack(synthesizedVoiceMessageFilePath.c_str(), 1.0f)));
         return;
     }
 
@@ -48,7 +50,7 @@ void VoiceManager::synthesizeVoiceMessage(const std::string& message, const std:
         voiceFile.open(filePath.c_str(), std::ios::out | std::ios::binary);
         voiceFile.write(GetStreamBytes(audioStream), GetStreamSize(audioStream));
         voiceFile.close();
-        synthesizedVoiceAudioTracks_.insert(std::make_pair(outputTrackName, AudioTrack(synthesizedVoiceMessageFilePath.c_str())));
+        synthesizedVoiceAudioTracks_.insert(std::make_pair(outputTrackName, AudioTrack(synthesizedVoiceMessageFilePath.c_str(), Config::getInstance().masterVolumeForAwsSynthesized)));
 
         BOOST_LOG_TRIVIAL(info) << "Saving to file done.";
     }
