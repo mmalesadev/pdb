@@ -34,6 +34,7 @@ void InputManager::init()
 
     map_->MapBool(Button::BUTTON_Q, keyboardId_, gainput::KeyQ);
     map_->MapBool(Button::BUTTON_W, keyboardId_, gainput::KeyW);
+    map_->MapBool(Button::BUTTON_S, keyboardId_, gainput::KeyS);
     map_->MapBool(Button::BUTTON_E, keyboardId_, gainput::KeyE);
 
     gainput::DeviceButtonSpec buttonSpec;

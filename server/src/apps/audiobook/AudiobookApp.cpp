@@ -1,10 +1,6 @@
 #include "AudiobookApp.h"
 #include <boost/log/trivial.hpp>
 
-#include <boost/filesystem.hpp>
-
-namespace filesystem = boost::filesystem;
-
 namespace Pdb
 {
 
@@ -16,7 +12,6 @@ AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManage
 
 void AudiobookApp::init()
 {
-    loadTracks();
     synthesizeVoiceMessages();
     BOOST_LOG_TRIVIAL(info) << "Initialized AudiobookApp.";
 }
@@ -24,7 +19,7 @@ void AudiobookApp::init()
 void AudiobookApp::synthesizeVoiceMessages()
 {
     /* Synthesizing lodaded audio track titles e.g. "harry potter" for "harry_potter.mp3" */
-    for (auto& audioTrack : audioTracks_)
+    for (auto& audioTrack : audiobookPlayer_.getAudioTracks())
     {
         std::string message = audioTrack.getTrackName();
         std::replace(message.begin(), message.end(), '_', ' ');
@@ -33,64 +28,37 @@ void AudiobookApp::synthesizeVoiceMessages()
 
     /* Synthesizing helper messages for blind people e.g. "playing audiobook" */
     voiceManager_.synthesizeVoiceMessage("<speak>Odtwarzanie książki<break time=\"50ms\"/></speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "playing_audiobook");
+    voiceManager_.synthesizeVoiceMessage("<speak>Wybrano książkę<break time=\"50ms\"/></speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "chosen_audiobook");
 }
 
 void AudiobookApp::appLoopFunction()
 {
     BOOST_LOG_TRIVIAL(info) << "Starting AudiobookApp loop function.";
+
     while(true)
     {
         inputManager_.update();
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
         {
-            audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"));
-        }
-
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_W))
-        {
-            audioManager_.playAndGetAudioStream(audioTracks_[1]);
+            //audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"));
+            audiobookPlayer_.switchToPreviousAudiobook();
+            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
         }
 
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_E))
         {
-            audiobookPlayer_.playAudiobook(audioTracks_[1]);
+            //audiobookPlayer_.playAudiobook(audioTracks_[1]);
+            audiobookPlayer_.switchToNextAudiobook();
+            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
         }
-        
+
+        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_W))
+        {
+            BOOST_LOG_TRIVIAL(info) << "Playing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+            audiobookPlayer_.playCurrentTrack();
+        }      
     }
     BOOST_LOG_TRIVIAL(info) << "Ending AudiobookApp loop function.";
-}
-
-void AudiobookApp::loadTracks()
-{
-    filesystem::path path(std::string("../data/audiobooks/"));
-    std::string fileExtension;
-
-    if (!filesystem::exists(path))
-    {
-        BOOST_LOG_TRIVIAL(error) << "Directory with audiobooks not found.";
-        return;
-    }
-
-    if (filesystem::is_directory(path))
-    {
-        filesystem::directory_iterator endIter;
-        for (filesystem::directory_iterator dirItr(path); dirItr != endIter; ++dirItr)
-        {
-            if (filesystem::is_regular_file(dirItr->status()))
-            {
-                std::string trackName(dirItr->path().filename().c_str());
-                fileExtension = (trackName.length() > 4) ? trackName.substr(trackName.length() - 3, 3) : "";
-
-                if (fileExtension == "mp3" || fileExtension == "wav")
-                {
-                    AudioTrack audioTrack("../data/audiobooks/" + trackName);
-                    audioTracks_.push_back(audioTrack);
-                    BOOST_LOG_TRIVIAL(info) << trackName << " loaded.";
-                }
-            }
-        }
-    }
-    BOOST_LOG_TRIVIAL(info) << audioTracks_.size() << " audio tracks successfully loaded.";
 }
 
 }
