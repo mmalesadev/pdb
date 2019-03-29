@@ -10,17 +10,21 @@ class AudiobookPlayer
 {
 public:
     AudiobookPlayer(AudioManager& audioManager, VoiceManager& voiceManager);
-    void playAudiobook(AudioTrack& audioTrack);
+
+    void switchToNextAudiobook();
+    void switchToPreviousAudiobook();
+    void playCurrentTrack();
     void pauseAudiobook();
+
+    AudioTrack getCurrentTrack()                        { return audioTracks_[currentIndex_]; }
+    std::vector<AudioTrack> & getAudioTracks()          { return audioTracks_; }
 
 private:
     AudioManager& audioManager_;
     VoiceManager& voiceManager_;
 
     void loadTracks();
-    void switchToNextAudiobook();
-    void switchToPreviousAudiobook();
-    void playCurrentTrack();
+    void playAudiobook(AudioTrack& audioTrack);
     int currentIndex_;
 
     std::vector<AudioTrack> audioTracks_;

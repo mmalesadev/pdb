@@ -1,23 +1,17 @@
 #include "AudiobookApp.h"
 #include <boost/log/trivial.hpp>
 
-#include <boost/filesystem.hpp>
-
-namespace filesystem = boost::filesystem;
-
 namespace Pdb
 {
 
 AudiobookApp::AudiobookApp(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager)
     : Pdb::App(audioManager, inputManager, voiceManager), audiobookPlayer_(audioManager, voiceManager)
 {
-    this->currentIndex_ = 0;
     BOOST_LOG_TRIVIAL(info) << "Creating AudiobookApp.";
 }
 
 void AudiobookApp::init()
 {
-    loadTracks();
     synthesizeVoiceMessages();
     BOOST_LOG_TRIVIAL(info) << "Initialized AudiobookApp.";
 }
@@ -25,7 +19,7 @@ void AudiobookApp::init()
 void AudiobookApp::synthesizeVoiceMessages()
 {
     /* Synthesizing lodaded audio track titles e.g. "harry potter" for "harry_potter.mp3" */
-    for (auto& audioTrack : audioTracks_)
+    for (auto& audioTrack : audiobookPlayer_.getAudioTracks())
     {
         std::string message = audioTrack.getTrackName();
         std::replace(message.begin(), message.end(), '_', ' ');
@@ -47,28 +41,22 @@ void AudiobookApp::appLoopFunction()
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
         {
             //audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"));
-            this->switchAudiobook('L');
-            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << this->audioTracks_[currentIndex_].getTrackName() << ".";
+            audiobookPlayer_.switchToPreviousAudiobook();
+            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
         }
 
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_E))
         {
             //audiobookPlayer_.playAudiobook(audioTracks_[1]);
-            this->switchAudiobook('R');
-            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << this->audioTracks_[currentIndex_].getTrackName() << ".";
+            audiobookPlayer_.switchToNextAudiobook();
+            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
         }
 
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_W))
         {
-            BOOST_LOG_TRIVIAL(info) << "Playing " << this->audioTracks_[currentIndex_].getTrackName() << ".";
-            this->playCurrentTrack();
-        }
-
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_S))
-        {
-            
-        }
-        
+            BOOST_LOG_TRIVIAL(info) << "Playing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+            audiobookPlayer_.playCurrentTrack();
+        }      
     }
     BOOST_LOG_TRIVIAL(info) << "Ending AudiobookApp loop function.";
 }

@@ -24,11 +24,4 @@ AudioTrack::~AudioTrack()
 
 }
 
-void AudioTrack::assignWith(const AudioTrack & track)
-{
-    this->filePath_ = track.filePath_;
-    this->trackName_ = track.trackName_;
-    this->format_ = track.format_;
-}
-
 }

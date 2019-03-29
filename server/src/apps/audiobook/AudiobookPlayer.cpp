@@ -2,6 +2,9 @@
 #include <boost/log/trivial.hpp>
 #include <future>
 #include <memory>
+#include <boost/filesystem.hpp>
+
+namespace filesystem = boost::filesystem;
 
 namespace Pdb
 {
@@ -10,6 +13,7 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
     : audioManager_(audioManager), voiceManager_(voiceManager)
 {
     this->loadTracks();
+    currentIndex_ = 0;
 }
 
 void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
@@ -62,32 +66,22 @@ void AudiobookPlayer::loadTracks()
 void AudiobookPlayer::switchToNextAudiobook()
 {
     if (currentIndex_ == audioTracks_.size() - 1)
-    {
         currentIndex_ = 0;
-    }
-    
     else
-    {
         ++currentIndex_;
-    }
 }
 
 void AudiobookPlayer::switchToPreviousAudiobook()
 {
     if (currentIndex_ == 0)
-    {
-        currentIndex_ = audioTracks_.size() - 1;
-    }
-    
+        currentIndex_ = audioTracks_.size() - 1;  
     else
-    {
         --currentIndex_;
-    }
 }
 
 void AudiobookPlayer::playCurrentTrack()
 {
-    audioManager_.playAndGetAudioStream(this->audioTracks_[currentIndex_]);
+    audioManager_.playAndGetAudioStream(audioTracks_[currentIndex_]);
 }
 
 }

@@ -17,8 +17,6 @@ public:
     std::string getFilePath() const { return filePath_; }
     std::string getTrackName() const { return trackName_; }
 
-    void assignWith(const AudioTrack & track);
-
 private:
     Format format_;
     std::string filePath_;
