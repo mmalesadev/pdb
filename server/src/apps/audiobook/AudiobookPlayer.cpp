@@ -29,6 +29,8 @@ void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
 void AudiobookPlayer::pauseCurrentTrack()
 {
     BOOST_LOG_TRIVIAL(info) << "Pausing audiotrack: " << audioTracks_[currentTrackIndex_].getTrackName();
+    if (currentlyPlayedAudioStream_->isPaused()) audioManager_.playSync(voiceManager_.getSynthesizedVoiceAudioTracks().at("unpausing_audiobook"));
+    else audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("pausing_audiobook"));
     currentlyPlayedAudioStream_->pauseToggle();
 }
 
@@ -71,6 +73,11 @@ void AudiobookPlayer::switchToNextAudiobook()
         currentTrackIndex_ = 0;
     else
         ++currentTrackIndex_;
+
+    audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
+        voiceManager_.getSynthesizedVoiceAudioTracks().at("chosen_next"),
+        voiceManager_.getSynthesizedVoiceAudioTracks().at(getCurrentTrack().getTrackName())
+    }));
 }
 
 void AudiobookPlayer::switchToPreviousAudiobook()
@@ -79,6 +86,11 @@ void AudiobookPlayer::switchToPreviousAudiobook()
         currentTrackIndex_ = audioTracks_.size() - 1;  
     else
         --currentTrackIndex_;
+
+    audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
+        voiceManager_.getSynthesizedVoiceAudioTracks().at("chosen_previous"),
+        voiceManager_.getSynthesizedVoiceAudioTracks().at(getCurrentTrack().getTrackName())
+    }));
 }
 
 void AudiobookPlayer::playCurrentTrack()
