@@ -21,35 +21,21 @@ AudioStream* AudioManager::playAndGetAudioStream(const AudioTrack& audioTrack)
 {
     BOOST_LOG_TRIVIAL(info) << "Playing " << audioTrack.getFilePath() << ".";
 
-    AudioStream* foundStream = nullptr;
-    if (audioTrack.isMp3())
-    {
-        for (auto& stream : mp3AudioStreams_) 
-            if (stream->isAvailable()) 
-                { foundStream = stream.get(); break; }
-    }
-    else if (audioTrack.isWav())
-    {
-        for (auto& stream : wavAudioStreams_) 
-            if (stream->isAvailable())
-                { foundStream = stream.get(); break; }
-    }
-    else
-    {
-        BOOST_LOG_TRIVIAL(error) << "Unknown audio track format. Aborting. Returning empty stream. " << audioTrack.getFilePath();
-        return foundStream;
-    }
+    AudioStream* foundStream = findFreeStream(audioTrack);
 
     if(foundStream)
     {
         foundStream->play(audioTrack);
     }
-    else
-    {
-        BOOST_LOG_TRIVIAL(error) << "No free audio stream found. Current free mp3 audio stream count: " << getFreeMp3AudioStreamCount()
-            << ". Current free wav audio stream count: " << getFreeWavAudioStreamCount();
-    }
+
     return foundStream;
+}
+
+void AudioManager::playSync(const AudioTrack& audioTrack)
+{
+    BOOST_LOG_TRIVIAL(info) << "Playing " << audioTrack.getFilePath() << ".";
+
+    playAndGetAudioStream(audioTrack)->getAudioStreamFuture().get();
 }
 
 std::future<AudioStream*> AudioManager::playMultipleAndGetLastAudioStream(const std::vector<AudioTrack>& audioTracks)
@@ -96,6 +82,35 @@ void AudioManager::printAllStreamsInfo() const
     {
         BOOST_LOG_TRIVIAL(debug) << "wav stream isAvailable=" << stream->isAvailable();
     }
+}
+
+AudioStream* AudioManager::findFreeStream(const AudioTrack& audioTrack)
+{
+    AudioStream* foundStream = nullptr;
+    if (audioTrack.isMp3())
+    {
+        for (auto& stream : mp3AudioStreams_) 
+            if (stream->isAvailable()) 
+                { foundStream = stream.get(); break; }
+    }
+    else if (audioTrack.isWav())
+    {
+        for (auto& stream : wavAudioStreams_) 
+            if (stream->isAvailable())
+                { foundStream = stream.get(); break; }
+    }
+    else
+    {
+        BOOST_LOG_TRIVIAL(error) << "Unknown audio track format. Aborting. Returning empty stream. " << audioTrack.getFilePath();
+        return foundStream;
+    }
+
+    if(!foundStream)
+    {
+        BOOST_LOG_TRIVIAL(error) << "No free audio stream found. Current free mp3 audio stream count: " << getFreeMp3AudioStreamCount()
+            << ". Current free wav audio stream count: " << getFreeWavAudioStreamCount();
+    }
+    return foundStream;
 }
 
 }
