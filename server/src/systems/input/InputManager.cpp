@@ -32,13 +32,13 @@ void InputManager::init()
     }
     map_ = std::make_unique<gainput::InputMap>(manager_);
 
-    map_->MapBool(Button::BUTTON_Q, keyboardId_, gainput::KeyQ);
-    map_->MapBool(Button::BUTTON_W, keyboardId_, gainput::KeyW);
-    map_->MapBool(Button::BUTTON_S, keyboardId_, gainput::KeyS);
-    map_->MapBool(Button::BUTTON_E, keyboardId_, gainput::KeyE);
+    map_->MapBool(Button::REWIND_BUTTON, keyboardId_, gainput::KeyQ);
+    map_->MapBool(Button::PLAY_BUTTON, keyboardId_, gainput::KeyW);
+    map_->MapBool(Button::PAUSE_BUTTON, keyboardId_, gainput::KeyS);
+    map_->MapBool(Button::REWIND_FORWARD_BUTTON, keyboardId_, gainput::KeyE);
 
     gainput::DeviceButtonSpec buttonSpec;
-    map_->GetMappings(Button::BUTTON_Q, &buttonSpec, 1);
+    map_->GetMappings(Button::REWIND_BUTTON, &buttonSpec, 1);
     BOOST_LOG_TRIVIAL(info) << "Initialized InputManager.";
 }
 

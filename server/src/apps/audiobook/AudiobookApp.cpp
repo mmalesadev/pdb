@@ -40,6 +40,7 @@ void AudiobookApp::appLoopFunction()
 {
     BOOST_LOG_TRIVIAL(info) << "Starting AudiobookApp loop function.";
 
+    changeStateTo(CHOOSING);
     audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
         voiceManager_.getSynthesizedVoiceAudioTracks().at("choosing_audiobooks"),
         voiceManager_.getSynthesizedVoiceAudioTracks().at(audiobookPlayer_.getCurrentTrack().getTrackName())
@@ -48,32 +49,100 @@ void AudiobookApp::appLoopFunction()
     while(true)
     {
         inputManager_.update();
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
+
+        if (inputManager_.isButtonPressed(InputManager::Button::REWIND_BUTTON))
         {
-            audiobookPlayer_.switchToPreviousAudiobook();
-            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+            if (currentState_ == CHOOSING)
+            {
+                audiobookPlayer_.switchToPreviousAudiobook();
+                BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";         
+            }
+            else if (currentState_ == PLAYING)
+            {
+                // CHANGE STATE TO REWIND
+            }
+            else if (currentState_ == REWINDING)
+            {
+                // INCREASE REWIND SPEED
+            }
+            else if (currentState_ == REWINDING_FORWARD)
+            {
+                // DECREASE REWIND SPEED
+            }
+            else if (currentState_ == PAUSE)
+            {
+                // CHANGE STATE TO REWIND
+            }
         }
 
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_W))
+        if (inputManager_.isButtonPressed(InputManager::Button::PLAY_BUTTON))
         {
-            BOOST_LOG_TRIVIAL(info) << "Playing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
-            audiobookPlayer_.playCurrentTrack();
+            if (currentState_ == PLAYING)
+            {
+                // UNDEFINED
+            }
+            else
+            {
+                BOOST_LOG_TRIVIAL(info) << "Playing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+                audiobookPlayer_.playCurrentTrack();
+                changeStateTo(PLAYING);
+            }
         }
 
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_S))
+        if (inputManager_.isButtonPressed(InputManager::Button::PAUSE_BUTTON))
         {
-            BOOST_LOG_TRIVIAL(info) << "Pausing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
-            audiobookPlayer_.pauseCurrentTrack();
+            if (currentState_ == CHOOSING)
+            {
+                // UNDEFINED
+            }
+            else if (currentState_ == PAUSE)
+            {
+                changeStateTo(CHOOSING);
+            }
+            else
+            {
+                BOOST_LOG_TRIVIAL(info) << "Pausing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+                audiobookPlayer_.pauseCurrentTrack();
+                changeStateTo(PAUSE);               
+            }
         }
 
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_E))
+        if (inputManager_.isButtonPressed(InputManager::Button::REWIND_FORWARD_BUTTON))
         {
-            audiobookPlayer_.switchToNextAudiobook();
-            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+            if (currentState_ == CHOOSING)
+            {
+                audiobookPlayer_.switchToNextAudiobook();
+                BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+            }
+            else if (currentState_ == PLAYING)
+            {
+                // CHANGE STATE TO REWIND_FORWARD
+            }
+            else if (currentState_ == REWINDING)
+            {
+                // DECREASE REWINDING SPEED
+            }
+            else if (currentState_ == REWINDING_FORWARD)
+            {
+                // INCREASE REWINDING SPEED
+            }
+            else if (currentState_ == PAUSE)
+            {
+                // CHANGE STATE TO REWIND_FORWARD
+            }
         }
     }
 
     BOOST_LOG_TRIVIAL(info) << "Ending AudiobookApp loop function.";
+}
+
+void AudiobookApp::changeStateTo(States state)
+{
+    if (state == CHOOSING) currentState_ = CHOOSING;
+    else if (state == PLAYING) currentState_ = PLAYING;
+    else if (state == REWINDING) currentState_ = REWINDING;
+    else if (state == REWINDING_FORWARD) currentState_ = REWINDING_FORWARD;
+    else if (state == PAUSE) currentState_ = PAUSE;
 }
 
 }
