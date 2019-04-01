@@ -48,28 +48,17 @@ void AudiobookApp::appLoopFunction()
     while(true)
     {
         inputManager_.update();
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_Q))
+        auto& availableActions = audiobookPlayer_.getAvailableActions();
+        for (auto& action : availableActions) 
         {
-            audiobookPlayer_.switchToPreviousAudiobook();
-            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+            if (inputManager_.isButtonPressed(action.first))
+                action.second();
         }
 
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_W))
+        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_X))
         {
-            BOOST_LOG_TRIVIAL(info) << "Playing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
-            audiobookPlayer_.playCurrentTrack();
-        }
-
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_S))
-        {
-            BOOST_LOG_TRIVIAL(info) << "Pausing " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
-            audiobookPlayer_.pauseCurrentTrack();
-        }
-
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_E))
-        {
-            audiobookPlayer_.switchToNextAudiobook();
-            BOOST_LOG_TRIVIAL(info) << "Audiobook switched to " << audiobookPlayer_.getCurrentTrack().getTrackName() << ".";
+            audiobookPlayer_.printState();
+            BOOST_LOG_TRIVIAL(info) << availableActions.size();
         }
     }
 

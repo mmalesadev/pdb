@@ -17,7 +17,7 @@ public:
 
 private:
     void synthesizeVoiceMessages();
-
+    
     AudiobookPlayer audiobookPlayer_;
 };
 
