@@ -22,8 +22,9 @@ private:
     Config();
 
 public:
-    float masterVolumeForAwsSynthesized;
-    float masterVolumeForAudiobooks;
+    float volumeForAwsSynthesized;
+    float volumeForAudiobooks;
+    float masterVolume;
 
 private:
     ptree pt_;

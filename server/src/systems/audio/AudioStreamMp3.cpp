@@ -3,7 +3,7 @@
 namespace Pdb
 {
 
-AudioStreamMp3::AudioStreamMp3()
+AudioStreamMp3::AudioStreamMp3(float& masterVolume) : AudioStream(masterVolume)
 {
     mpg123_init();
     int err;
@@ -23,7 +23,7 @@ AudioStreamMp3::~AudioStreamMp3()
 
 void AudioStreamMp3::play(const AudioTrack& audioTrack)
 {
-    masterVolume_ = audioTrack.getMasterVolume();
+    volume_ = audioTrack.getVolume();
 
     std::string path = audioTrack.getFilePath();
     mpg123_open(mh_, path.c_str());
@@ -65,7 +65,7 @@ int AudioStreamMp3::playCallback(void *outputBuffer, void *inputBuffer, unsigned
 
     for (int i = 0; i < nBufferFrames; ++i)
     {
-        *outBuffer++ = *(mp3DecoderOutputBuffer++ + nPlayedFrames_) * masterVolume_;
+        *outBuffer++ = *(mp3DecoderOutputBuffer++ + nPlayedFrames_) * volume_ * masterVolume_;
         nDecodedBytesToProcessLeft_ -= 2;
         if (nDecodedBytesToProcessLeft_ == 0) break;
     }

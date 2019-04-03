@@ -12,9 +12,9 @@ AudioManager::AudioManager(const size_t nMp3AudioStreams, const size_t nWavAudio
     BOOST_LOG_TRIVIAL(info) << "Creating AudioManager app. Initializing " << nMp3AudioStreams << " mp3 audio streams and " << 
         nWavAudioStreams << " wav audio streams.";
     for (int i = 0; i < nMp3AudioStreams; ++i)
-        mp3AudioStreams_.push_back(std::make_unique<AudioStreamMp3>());
+        mp3AudioStreams_.push_back(std::make_unique<AudioStreamMp3>(masterVolume_));
     for (int i = 0; i < nWavAudioStreams; ++i)
-        wavAudioStreams_.push_back(std::make_unique<AudioStreamWav>());
+        wavAudioStreams_.push_back(std::make_unique<AudioStreamWav>(masterVolume_));
 }
 
 AudioStream* AudioManager::playAndGetAudioStream(const AudioTrack& audioTrack)
@@ -70,6 +70,18 @@ int AudioManager::getFreeMp3AudioStreamCount() const
     return std::count_if(mp3AudioStreams_.begin(), mp3AudioStreams_.end(), 
         [this](auto& stream){ return stream->isAvailable(); }
     );
+}
+
+void AudioManager::increaseMasterVolume()
+{
+    if (masterVolume_ <= 0.9)
+        masterVolume_ += 0.1;
+}
+
+void AudioManager::decreaseMasterVolume()
+{
+    if (masterVolume_ >= 0.1)
+        masterVolume_ -= 0.1;
 }
 
 void AudioManager::printAllStreamsInfo() const
