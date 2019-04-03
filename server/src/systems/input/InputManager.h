@@ -9,7 +9,7 @@ namespace Pdb
 class InputManager
 {
 public:
-    enum Button { BUTTON_Q, BUTTON_W, BUTTON_E, BUTTON_S, BUTTON_X };
+    enum Button { BUTTON_Q, BUTTON_W, BUTTON_E, BUTTON_S, BUTTON_X, BUTTON_UP, BUTTON_DOWN };
 
     InputManager();
     void init();

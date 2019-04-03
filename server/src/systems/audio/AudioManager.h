@@ -25,6 +25,9 @@ public:
     int getFreeMp3AudioStreamCount() const;
     int getFreeWavAudioStreamCount() const;
 
+    void increaseMasterVolume();
+    void decreaseMasterVolume();
+
     void printAllStreamsInfo() const;
 
 private:
@@ -32,6 +35,8 @@ private:
 
     std::vector< std::unique_ptr<AudioStreamMp3> > mp3AudioStreams_;
     std::vector< std::unique_ptr<AudioStreamWav> > wavAudioStreams_;
+
+    float masterVolume_;
 };
 
 }

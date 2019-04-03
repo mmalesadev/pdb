@@ -4,7 +4,7 @@
 namespace Pdb
 {
 
-AudioStream::AudioStream() : paused_(false)
+AudioStream::AudioStream(float& masterVolume) : paused_(false), masterVolume_(masterVolume)
 {
     rtAudio_ = std::make_unique<RtAudio>();
     int nDevices = rtAudio_->getDeviceCount();

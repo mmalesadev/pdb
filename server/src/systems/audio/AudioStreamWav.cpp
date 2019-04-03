@@ -3,14 +3,14 @@
 namespace Pdb
 {
 
-AudioStreamWav::AudioStreamWav()
+AudioStreamWav::AudioStreamWav(float& masterVolume) : AudioStream(masterVolume)
 {
 
 }
 
 void AudioStreamWav::play(const AudioTrack& audioTrack)
 {
-    masterVolume_ = audioTrack.getMasterVolume();
+    volume_ = audioTrack.getVolume();
 
     std::string path = audioTrack.getFilePath();
     audioFile_.load(path);

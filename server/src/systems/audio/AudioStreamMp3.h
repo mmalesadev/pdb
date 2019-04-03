@@ -9,7 +9,7 @@ namespace Pdb
 class AudioStreamMp3 : public AudioStream 
 {
 public:
-    AudioStreamMp3();
+    AudioStreamMp3(float& masterVolume);
     ~AudioStreamMp3();
 
     void play(const AudioTrack& audioTrack) override;

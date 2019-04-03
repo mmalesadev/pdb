@@ -14,8 +14,9 @@ Config::Config()
 	{
 		BOOST_LOG_TRIVIAL(error) << e.what();
 	}
-	masterVolumeForAwsSynthesized = pt_.get<float>("SynthesizedAudio.masterVolume");
-	masterVolumeForAudiobooks = pt_.get<float>("AudiobookAudio.masterVolume");
+	volumeForAwsSynthesized = pt_.get<float>("SynthesizedAudio.volume");
+	volumeForAudiobooks = pt_.get<float>("AudiobookAudio.volume");
+	masterVolume = pt_.get<float>("MasterVolume.masterVolume");
 }
 
 
