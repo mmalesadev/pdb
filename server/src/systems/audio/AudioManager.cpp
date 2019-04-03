@@ -1,13 +1,16 @@
 #include "AudioManager.h"
 #include <boost/log/trivial.hpp>
 #include <thread>
+
+#include "Config.h"
+
 #include <future>
 #include <memory>
 
 namespace Pdb
 {
 
-AudioManager::AudioManager(const size_t nMp3AudioStreams, const size_t nWavAudioStreams)
+AudioManager::AudioManager(const size_t nMp3AudioStreams, const size_t nWavAudioStreams) : masterVolume_(Config::getInstance().masterVolume)
 {
     BOOST_LOG_TRIVIAL(info) << "Creating AudioManager app. Initializing " << nMp3AudioStreams << " mp3 audio streams and " << 
         nWavAudioStreams << " wav audio streams.";

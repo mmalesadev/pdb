@@ -34,6 +34,7 @@ void AudiobookApp::synthesizeVoiceMessages()
     voiceManager_.synthesizeVoiceMessage("<speak>Wybrano poprzednią: </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "chosen_previous");
     voiceManager_.synthesizeVoiceMessage("<speak>Zatrzymano odtwarzanie. </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "pausing_audiobook");
     voiceManager_.synthesizeVoiceMessage("<speak>Wznawianie odtwarzania: </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "unpausing_audiobook");
+    voiceManager_.synthesizeVoiceMessage("<speak>Zakończono odtwarzanie: </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "stopping_audiobook");
 }
 
 void AudiobookApp::appLoopFunction()

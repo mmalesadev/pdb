@@ -59,6 +59,7 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
     pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::togglePause, this)));
     pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
     pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
+    pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_F, std::bind(&AudiobookPlayer::stopAudiobook, this)));
     availableActions_.insert(std::make_pair(State::PAUSED, std::move(pausedStateActions)));
 }
 
@@ -75,6 +76,7 @@ void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
         currentlyPlayedAudioStream_->getAudioStreamFuture().get();
         changeStateTo(State::CHOOSING);
         BOOST_LOG_TRIVIAL(info) << "Finished playing audiotrack.";
+        audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook"));
     };
     std::thread(audiobookFinishCallback).detach();
 }
@@ -178,6 +180,8 @@ void AudiobookPlayer::fastForwarding()
 void AudiobookPlayer::stopAudiobook()
 {
     changeStateTo(State::CHOOSING);
+    audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook"));
+    BOOST_LOG_TRIVIAL(info) << "Audiobook stopped.";
 }
 
 void AudiobookPlayer::printState()

@@ -18,8 +18,6 @@ public:
     void switchToPreviousAudiobook();
     void playCurrentTrack();
     void togglePause();
-    void increaseMasterVolume();
-    void decreaseMasterVolume();
     void rewinding();
     void fastForwarding();
     void stopAudiobook();
