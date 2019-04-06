@@ -9,9 +9,13 @@
 
 #include <memory>
 #include <iomanip>
+#include <string>
 
 int main(int argc, char* argv[])
 {
+    /* Initializing config file variables */
+    Pdb::Config::getInstance();
+
     /* Initializing logger */
     boost::log::register_simple_formatter_factory<boost::log::trivial::severity_level, char>("Severity");
     boost::log::add_console_log(
@@ -31,12 +35,23 @@ int main(int argc, char* argv[])
         boost::log::keywords::auto_flush = true
     );
     boost::log::add_common_attributes();
+    boost::log::trivial::severity_level severityLevel;
+    std::string configLoggingLevel = Pdb::Config::getInstance().loggingLevel;
+
+    if (configLoggingLevel == "info") severityLevel = boost::log::trivial::info;
+    else if (configLoggingLevel == "debug") severityLevel = boost::log::trivial::debug;
+    else if (configLoggingLevel == "trace") severityLevel = boost::log::trivial::trace;
+    else
+    {
+        BOOST_LOG_TRIVIAL(error) << "Config: " << configLoggingLevel << " is a wrong loggingLevel value.";
+		exit(0);
+    }
+
     boost::log::core::get()->set_filter(
-        boost::log::trivial::severity >= boost::log::trivial::info
+        boost::log::trivial::severity >= severityLevel
     );
 
     /* Starting app */
-    Pdb::Config::getInstance();
     Pdb::Server server;
 
     server.registerApp("network", std::make_unique<Pdb::NetworkApp>(server.getAudioManager(), server.getInputManager(), server.getVoiceManager()));

@@ -16,6 +16,8 @@ public:
     int playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, 
         double streamTime, RtAudioStreamStatus status) override;
 
+    void seek(int offsetInSeconds) override;
+
 private:
     mpg123_handle * mh_;
     unsigned char * mp3DecoderOutputBuffer_;

@@ -10,7 +10,7 @@ namespace Pdb
 {
 
 AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voiceManager) 
-    : audioManager_(audioManager), voiceManager_(voiceManager), currentlyPlayedAudioStream_(nullptr)
+    : audioManager_(audioManager), voiceManager_(voiceManager), currentlyPlayedAudioStream_(nullptr), fastForwardingSpeed_(0)
 {
     this->loadTracks();
     currentTrackIndex_ = 0;
@@ -27,8 +27,8 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
 
     // PLAYING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > playingStateActions;
-    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewinding, this)));
-    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForwarding, this)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewind, this)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForward, this)));
     playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::togglePause, this)));
     playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
     playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
@@ -36,9 +36,9 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
 
     // REWINDING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > rewindingStateActions;
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::increaseRewindingSpeed, this)));
+    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewind, this)));
     rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playCurrentTrack, this)));
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::decreaseRewindingSpeed, this)));
+    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForward, this)));
     rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::togglePause, this)));
     rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
     rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
@@ -46,9 +46,9 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
 
     // FAST_FORWARDING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > fastForwardingStateActions;
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::decreaseRewindingSpeed, this)));
+    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewind, this)));
     fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playCurrentTrack, this)));
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::increaseRewindingSpeed, this)));
+    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForward, this)));
     fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::togglePause, this)));
     fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
     fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
@@ -68,7 +68,6 @@ void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
     BOOST_LOG_TRIVIAL(info) << "Playing audiotrack: " << audioTrack.getTrackName() << " (" << audioTrack.getFilePath() << ")";
     currentlyPlayedAudioStream_ = audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({
             voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"),
-            voiceManager_.getSynthesizedVoiceAudioTracks().at(audioTrack.getTrackName()),
             audioTrack
         })).get();
     auto audiobookFinishCallback = [this]()
@@ -84,9 +83,17 @@ void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
 void AudiobookPlayer::togglePause()
 {
     BOOST_LOG_TRIVIAL(info) << "Toggling audiotrack pause: " << audioTracks_[currentTrackIndex_].getTrackName();
-    changeStateTo(State::PAUSED);
-    if (currentlyPlayedAudioStream_->isPaused()) audioManager_.playSync(voiceManager_.getSynthesizedVoiceAudioTracks().at("unpausing_audiobook"));
-    else audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("pausing_audiobook"));
+    fastForwardingSpeed_ = 0;
+    if (currentlyPlayedAudioStream_->isPaused())
+    {
+        audioManager_.playSync(voiceManager_.getSynthesizedVoiceAudioTracks().at("unpausing_audiobook"));
+        changeStateTo(State::PLAYING);
+    }
+    else
+    {
+        audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("pausing_audiobook"));
+        changeStateTo(State::PAUSED);
+    }
     currentlyPlayedAudioStream_->pauseToggle();
     BOOST_LOG_TRIVIAL(info) << "Paused = " << currentlyPlayedAudioStream_->isPaused();
 }
@@ -161,21 +168,67 @@ std::vector< std::pair<InputManager::Button, std::function<void()> > > & Audiobo
     return availableActions_.at(currentState_);
 }
 
-void AudiobookPlayer::increaseRewindingSpeed()
+void AudiobookPlayer::rewind()
 {
+    if (fastForwardingSpeed_ == 0)
+    {
+        currentlyPlayedAudioStream_->pauseToggle();
+        fastForwardingSpeed_ = -2;
+        changeStateTo(State::REWINDING);
+        std::thread([=]()
+        {
+            int fastForwardedSeconds = 0;
+            while (fastForwardingSpeed_ != 0)
+            { 
+                auto sleepToTime = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+                fastForwardedSeconds += fastForwardingSpeed_;
+                std::this_thread::sleep_until(sleepToTime);
+                BOOST_LOG_TRIVIAL(info) << "Fast-forwarded seconds: " << fastForwardedSeconds;
+            }
+            currentlyPlayedAudioStream_->seek(fastForwardedSeconds);
+        }).detach();
+    }
+    else if (fastForwardingSpeed_ == 2)
+    {
+        currentlyPlayedAudioStream_->pauseToggle();
+        fastForwardingSpeed_ = 0;
+        changeStateTo(State::PLAYING);
+    }
+    else if (fastForwardingSpeed_ < 0) fastForwardingSpeed_ *= 2;
+    else if (fastForwardingSpeed_ > 0) fastForwardingSpeed_ *= 0.5f;
+
+    BOOST_LOG_TRIVIAL(info) << "Set fast-forwardings speed to " << fastForwardingSpeed_;
 }
-void AudiobookPlayer::decreaseRewindingSpeed()
+void AudiobookPlayer::fastForward()
 {
-}
-void AudiobookPlayer::rewinding()
-{
-    changeStateTo(State::REWINDING);
-    BOOST_LOG_TRIVIAL(info) << "Rewinding.";
-}
-void AudiobookPlayer::fastForwarding()
-{
-    changeStateTo(State::FAST_FORWARDING);
-    BOOST_LOG_TRIVIAL(info) << "Fast forwarding.";
+    if (fastForwardingSpeed_ == 0)
+    {
+        currentlyPlayedAudioStream_->pauseToggle();
+        fastForwardingSpeed_ = 2;
+        changeStateTo(State::FAST_FORWARDING);
+        std::thread([=]()
+        {
+            int fastForwardedSeconds = 0;
+            while (fastForwardingSpeed_ != 0)
+            { 
+                auto sleepToTime = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+                fastForwardedSeconds += fastForwardingSpeed_;
+                std::this_thread::sleep_until(sleepToTime);
+                BOOST_LOG_TRIVIAL(info) << "Fast-forwarded seconds: " << fastForwardedSeconds;
+            }
+            currentlyPlayedAudioStream_->seek(fastForwardedSeconds);
+        }).detach();
+    }
+    else if (fastForwardingSpeed_ == -2)
+    {
+        currentlyPlayedAudioStream_->pauseToggle();
+        fastForwardingSpeed_ = 0;
+        changeStateTo(State::PLAYING);
+    }
+    else if (fastForwardingSpeed_ < 0) fastForwardingSpeed_ *= 0.5f;
+    else if (fastForwardingSpeed_ > 0) fastForwardingSpeed_ *= 2;
+
+    BOOST_LOG_TRIVIAL(info) << "Set fast-forwardings speed to " << fastForwardingSpeed_;
 }
 void AudiobookPlayer::stopAudiobook()
 {
