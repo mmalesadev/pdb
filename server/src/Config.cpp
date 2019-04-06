@@ -1,5 +1,6 @@
 #include "Config.h"
 #include <boost/log/trivial.hpp>
+#include <vector>
 
 namespace Pdb
 {
@@ -14,6 +15,8 @@ Config::Config()
 	{
 		BOOST_LOG_TRIVIAL(error) << e.what();
 	}
+	
+	loggingLevel = pt_.get<std::string>("General.loggingLevel");
 	volumeForAwsSynthesized = pt_.get<float>("SynthesizedAudio.volume");
 	volumeForAudiobooks = pt_.get<float>("AudiobookAudio.volume");
 	masterVolume = pt_.get<float>("MasterVolume.masterVolume");

@@ -18,8 +18,8 @@ public:
     void switchToPreviousAudiobook();
     void playCurrentTrack();
     void togglePause();
-    void rewinding();
-    void fastForwarding();
+    void rewind();
+    void fastForward();
     void stopAudiobook();
 
     void printState();
@@ -30,17 +30,16 @@ public:
     std::vector<AudioTrack> & getAudioTracks()          { return audioTracks_; }
 
 private:
-    AudioManager& audioManager_;
-    VoiceManager& voiceManager_;
-
     void loadTracks();
     void playAudiobook(AudioTrack& audioTrack);
-    void increaseRewindingSpeed();
-    void decreaseRewindingSpeed();
+
+    AudioManager& audioManager_;
+    VoiceManager& voiceManager_;
 
     int currentTrackIndex_;
     std::vector<AudioTrack> audioTracks_;
     AudioStream* currentlyPlayedAudioStream_;
+    int fastForwardingSpeed_;
 
     std::unordered_map<State, std::vector< std::pair<InputManager::Button, std::function<void()> > > > availableActions_;
 

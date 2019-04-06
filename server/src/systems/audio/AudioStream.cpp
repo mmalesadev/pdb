@@ -4,7 +4,7 @@
 namespace Pdb
 {
 
-AudioStream::AudioStream(float& masterVolume) : paused_(false), masterVolume_(masterVolume)
+AudioStream::AudioStream(float& masterVolume) : masterVolume_(masterVolume), state_(State::AVAILABLE)
 {
     rtAudio_ = std::make_unique<RtAudio>();
     int nDevices = rtAudio_->getDeviceCount();
@@ -17,14 +17,14 @@ AudioStream::AudioStream(float& masterVolume) : paused_(false), masterVolume_(ma
 
 void AudioStream::pauseToggle()
 {
-    if(paused_)
+    if(state_ == State::PAUSED)
     {
         rtAudio_->startStream();
-        paused_ = false;
+        state_ = State::PLAYING;
     }
     else
     {
-        paused_ = true;
+        state_ =State::PAUSED;
         rtAudio_->stopStream();
     }
 }
