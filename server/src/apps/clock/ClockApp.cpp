@@ -105,6 +105,9 @@ void ClockApp::playCurrentTime()
     tm result;
     tm * currentTime = localtime_r(&sec, &result);
 
+    std::cout << "hour_" + std::to_string(currentTime->tm_hour) << std::endl;
+    std::cout << "minute_" + std::to_string(currentTime->tm_min) << std::endl;
+
     audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
         voiceManager_.getSynthesizedVoiceAudioTracks().at("hour_" + std::to_string(currentTime->tm_hour)),
         voiceManager_.getSynthesizedVoiceAudioTracks().at("minute_" + std::to_string(currentTime->tm_min))
