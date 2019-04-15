@@ -35,6 +35,15 @@ void AudiobookApp::synthesizeVoiceMessages()
     voiceManager_.synthesizeVoiceMessage("<speak>Zatrzymano odtwarzanie. </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "pausing_audiobook");
     voiceManager_.synthesizeVoiceMessage("<speak>Wznawianie odtwarzania: </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "unpausing_audiobook");
     voiceManager_.synthesizeVoiceMessage("<speak>Zakończono odtwarzanie: </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "stopping_audiobook");
+    voiceManager_.synthesizeVoiceMessage("<speak>Przewijanie do przodu. </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "fast_forwarding");
+    voiceManager_.synthesizeVoiceMessage("<speak>Przewijanie do tyłu. </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "rewinding");
+    voiceManager_.synthesizeVoiceMessage("<speak>2-krotne </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "2x");
+    voiceManager_.synthesizeVoiceMessage("<speak>4-krotne </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "4x");
+    voiceManager_.synthesizeVoiceMessage("<speak>8-krotne </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "8x");
+    voiceManager_.synthesizeVoiceMessage("<speak>16-krotne </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "16x");
+    voiceManager_.synthesizeVoiceMessage("<speak>32-krotne </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "32x");
+    voiceManager_.synthesizeVoiceMessage("<speak>64-krotne </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "64x");
+    voiceManager_.synthesizeVoiceMessage("<speak>128-krotne </speak>", "../data/synthesized_sounds/apps/audiobook/messages/pl", "128x");
 }
 
 void AudiobookApp::appLoopFunction()
