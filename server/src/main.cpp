@@ -3,6 +3,7 @@
 
 #include "apps/network/NetworkApp.h"
 #include "apps/audiobook/AudiobookApp.h"
+#include "apps/clock/ClockApp.h"
 
 #include "boost/log/trivial.hpp"
 #include "boost/log/utility/setup.hpp"
@@ -56,6 +57,7 @@ int main(int argc, char* argv[])
 
     server.registerApp("network", std::make_unique<Pdb::NetworkApp>(server.getAudioManager(), server.getInputManager(), server.getVoiceManager()));
     server.registerApp("audiobook", std::make_unique<Pdb::AudiobookApp>(server.getAudioManager(), server.getInputManager(), server.getVoiceManager()));
+    server.registerApp("clock", std::make_unique<Pdb::ClockApp>(server.getAudioManager(), server.getInputManager(), server.getVoiceManager()));
 
     server.run();
     
