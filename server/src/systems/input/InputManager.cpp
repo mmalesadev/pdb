@@ -40,6 +40,7 @@ void InputManager::init()
     map_->MapBool(Button::BUTTON_UP, keyboardId_, gainput::KeyUp);
     map_->MapBool(Button::BUTTON_DOWN, keyboardId_, gainput::KeyDown);
     map_->MapBool(Button::BUTTON_F, keyboardId_, gainput::KeyF);
+    map_->MapBool(Button::BUTTON_T, keyboardId_, gainput::KeyT);
 
     BOOST_LOG_TRIVIAL(info) << "Initialized InputManager.";
 }

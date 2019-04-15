@@ -64,6 +64,8 @@ set(PDB_SERVER_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/src/apps/App.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/apps/network/NetworkApp.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/apps/network/NetworkApp.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/clock/ClockApp.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/apps/clock/ClockApp.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/apps/audiobook/AudiobookApp.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/apps/audiobook/AudiobookApp.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/apps/audiobook/AudiobookPlayer.cpp"
