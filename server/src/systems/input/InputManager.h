@@ -12,6 +12,7 @@ public:
     enum Button { BUTTON_Q, BUTTON_W, BUTTON_E, BUTTON_S, BUTTON_X, BUTTON_UP, BUTTON_DOWN, BUTTON_F, BUTTON_T, BUTTON_D};
 
     InputManager();
+
     void init();
     void update();
     bool isButtonPressed(Button button);

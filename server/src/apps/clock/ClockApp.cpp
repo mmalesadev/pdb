@@ -7,8 +7,8 @@
 namespace Pdb
 {
 
-ClockApp::ClockApp(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager)
-    : Pdb::App(audioManager, inputManager, voiceManager)
+ClockApp::ClockApp(VoiceManager& voiceManager)
+    : Pdb::App(voiceManager)
 {
 }
 
@@ -21,8 +21,7 @@ void ClockApp::init()
 void ClockApp::synthesizeClockReadings()
 {
     /* Synthesizing hour readings */
-
-    voiceManager_.synthesizeVoiceMessage("<speak>północ. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/hours/", "0");
+    voiceManager_.synthesizeVoiceMessage("<speak>północ. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/hours/", "hour_0");
 
     for (int hourIndex = 1; hourIndex <= 23; ++hourIndex)
         voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(hourIndex) + ":00. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/hours/", "hour_" + std::to_string(hourIndex));
@@ -35,7 +34,6 @@ void ClockApp::synthesizeClockReadings()
         voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(minuteIndex) + ". </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/minutes/", "minute_" + std::to_string(minuteIndex));
 
     /* Synthesizing weekday readings */
-
     voiceManager_.synthesizeVoiceMessage("<speak>niedziela. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/weekdays/", "weekday_1");
     voiceManager_.synthesizeVoiceMessage("<speak>poniedziałek. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/weekdays/", "weekday_2");
     voiceManager_.synthesizeVoiceMessage("<speak>wtorek. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/weekdays/", "weekday_3");    
@@ -45,21 +43,17 @@ void ClockApp::synthesizeClockReadings()
     voiceManager_.synthesizeVoiceMessage("<speak>sobota. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/weekdays/", "weekday_7");
 
     /* Synthesizing day readings */
-
     for (int dayIndex = 1; dayIndex <= 31; ++dayIndex)
     {
         if ((dayIndex % 10 == 2 || dayIndex % 10 == 3) && dayIndex != 12 && dayIndex != 13)
             voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(dayIndex) + "-i. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/days/", "day_" + std::to_string(dayIndex));
-        
         else if (dayIndex % 10 == 4)
             voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(dayIndex) + "-ty. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/days/", "day_" + std::to_string(dayIndex));
-
         else
             voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(dayIndex) + "-y. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/days/", "day_" + std::to_string(dayIndex));   
     }
 
     /* Synthesizing month readings */
-
     voiceManager_.synthesizeVoiceMessage("<speak>stycznia. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/months/", "month_1");
     voiceManager_.synthesizeVoiceMessage("<speak>lutego. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/months/", "month_2"); 
     voiceManager_.synthesizeVoiceMessage("<speak>marca. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/months/", "month_3");
@@ -74,15 +68,12 @@ void ClockApp::synthesizeClockReadings()
     voiceManager_.synthesizeVoiceMessage("<speak>grudnia. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/months/", "month_12");
 
     /* Synthesizing year readings */
-
     for (int yearIndex = 0; yearIndex <= 100; ++yearIndex)
     {
         if ((2019 + yearIndex) % 10 == 2 || (2019 + yearIndex) % 10 == 3)
             voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(2019 + yearIndex) + "-i. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/years/", "year_" + std::to_string(2019 + yearIndex));
-        
         else if ((2019 + yearIndex) % 10 == 4)
             voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(2019 + yearIndex) + "-ty. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/years/", "year_" + std::to_string(2019 + yearIndex));
-
         else
             voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(2019 + yearIndex) + "-y. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/years/", "year_" + std::to_string(2019 + yearIndex));   
     }

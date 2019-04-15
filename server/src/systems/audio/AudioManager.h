@@ -2,7 +2,9 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 #include <algorithm>
+#include <unordered_map>
 
 #include "systems/audio/AudioStream.h"
 #include "systems/audio/AudioStreamMp3.h"
@@ -31,6 +33,8 @@ public:
     void printAllStreamsInfo() const;
 
 private:
+    AudioStream* currentlyPlayedAudioStream_;
+
     AudioStream* findFreeStream(const AudioTrack& audioTrack);
 
     std::vector< std::unique_ptr<AudioStreamMp3> > mp3AudioStreams_;

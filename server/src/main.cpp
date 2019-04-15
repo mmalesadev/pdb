@@ -55,9 +55,9 @@ int main(int argc, char* argv[])
     /* Starting app */
     Pdb::Server server;
 
-    server.registerApp("network", std::make_unique<Pdb::NetworkApp>(server.getAudioManager(), server.getInputManager(), server.getVoiceManager()));
-    server.registerApp("audiobook", std::make_unique<Pdb::AudiobookApp>(server.getAudioManager(), server.getInputManager(), server.getVoiceManager()));
-    server.registerApp("clock", std::make_unique<Pdb::ClockApp>(server.getAudioManager(), server.getInputManager(), server.getVoiceManager()));
+    server.registerApp("network", std::make_unique<Pdb::NetworkApp>(server.getVoiceManager()));
+    server.registerApp("audiobook", std::make_unique<Pdb::AudiobookApp>(server.getVoiceManager()));
+    server.registerApp("clock", std::make_unique<Pdb::ClockApp>(server.getVoiceManager()));
 
     server.run();
     

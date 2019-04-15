@@ -5,9 +5,10 @@
 namespace Pdb
 {
 
-void Server::registerApp(std::string name, std::unique_ptr<App> App)
+void Server::registerApp(const std::string& name, std::unique_ptr<App> app)
 {
-    apps_.insert(std::make_pair(name, std::move(App)));
+    app->setName(name);
+    apps_.insert(std::make_pair(name, std::move(app)));
 }
 
 void Server::run()
