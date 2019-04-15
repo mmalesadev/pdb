@@ -7,7 +7,7 @@ namespace Pdb
 class ClockApp : public App
 {
 public:
-    ClockApp(AudioManager& audioManager, InputManager& inputManager, VoiceManager& voiceManager);
+    ClockApp(VoiceManager& voiceManager);
     void init() override;    
     void appLoopFunction() override;
 
