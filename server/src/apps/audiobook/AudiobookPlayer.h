@@ -3,6 +3,8 @@
 #include "systems/audio/AudioManager.h"
 #include "systems/voice/VoiceManager.h"
 #include "systems/input/InputManager.h"
+#include <atomic>
+#include <thread>
 
 namespace Pdb
 {
@@ -33,13 +35,18 @@ private:
     void loadTracks();
     void playAudiobook(AudioTrack& audioTrack);
 
+    void fastForwardingTimerFunction();
+
     AudioManager& audioManager_;
     VoiceManager& voiceManager_;
 
     int currentTrackIndex_;
     std::vector<AudioTrack> audioTracks_;
     AudioStream* currentlyPlayedAudioStream_;
+
     int fastForwardingSpeed_;
+    std::atomic<int> fastForwardedSeconds_;
+    std::thread fastForwardingTimerThread_;
 
     std::unordered_map<State, std::vector< std::pair<InputManager::Button, std::function<void()> > > > availableActions_;
 

@@ -48,18 +48,6 @@ void AudioStreamMp3::play(const AudioTrack& audioTrack)
 int AudioStreamMp3::playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, 
     double streamTime, RtAudioStreamStatus status)
 {
-    // if (fastForwardingSpeed_ == 2)
-    // {
-    //     fastForwardingSpeed_ = 0;
-    //     BOOST_LOG_TRIVIAL(info) << "Set stream offset to: " << mpg123_seek_frame(mh_, mpg123_timeframe(mh_, 200.0f), SEEK_SET);
-    // }
-
-    // if (fastForwardingSpeed_ == -2)
-    // {
-    //     fastForwardingSpeed_ = 0;
-    //     BOOST_LOG_TRIVIAL(info) << "Set stream offset to: " << mpg123_seek_frame(mh_, mpg123_timeframe(mh_, 0.0f), SEEK_SET);
-    // }
-
     BOOST_LOG_TRIVIAL(debug) << "nBufferFrames=" << nBufferFrames << ", streamTime=" << streamTime;
     if ((nPlayedFrames_ * 2) % mp3DecoderOutputBufferSize_ == 0)
     {
@@ -117,6 +105,7 @@ void AudioStreamMp3::seek(int offsetInSeconds)
         sampleOffset << ". Set position to sample: " << currentSample + sampleOffset;
 
     mpg123_seek(mh_, currentSample + sampleOffset, SEEK_SET);
+    nPlayedFrames_ = 0;
 }
 
 

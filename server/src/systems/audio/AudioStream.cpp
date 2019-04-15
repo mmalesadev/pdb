@@ -19,13 +19,15 @@ void AudioStream::pauseToggle()
 {
     if(state_ == State::PAUSED)
     {
+        BOOST_LOG_TRIVIAL(info) << "Resuming stream.";
         rtAudio_->startStream();
         state_ = State::PLAYING;
     }
     else
     {
-        state_ =State::PAUSED;
-        rtAudio_->stopStream();
+        BOOST_LOG_TRIVIAL(info) << "Pausing stream.";
+        state_ = State::PAUSED;
+        rtAudio_->abortStream();
     }
 }
 

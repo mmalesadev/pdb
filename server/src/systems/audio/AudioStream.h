@@ -31,7 +31,7 @@ public:
     std::future<AudioStream*> getAudioStreamFuture() { return audioStreamPromise_.get_future(); }
 
 protected:
-    enum class State { AVAILABLE, PLAYING, REWINDING, FAST_FORWARDING, PAUSED };
+    enum class State { AVAILABLE, PLAYING, PAUSED };
 
     std::unique_ptr<RtAudio> rtAudio_;
     RtAudio::StreamParameters parameters_;
