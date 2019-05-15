@@ -10,7 +10,7 @@ namespace Pdb
 {
 
 AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voiceManager) 
-    : audioManager_(audioManager), voiceManager_(voiceManager), currentlyPlayedAudioStream_(nullptr), fastForwardingSpeed_(0)
+    : audioManager_(audioManager), voiceManager_(voiceManager), fastForwardingSpeed_(0), currentAudioTask_(nullptr), pausedAudioTask_(nullptr)
 {
     this->loadTracks();
     currentTrackIndex_ = 0;
@@ -19,7 +19,7 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
     // CHOOSING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > choosingStateActions;
     choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::switchToPreviousAudiobook, this)));
-    choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playCurrentTrack, this)));
+    choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playChosenAudiobook, this)));
     choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::switchToNextAudiobook, this)));
     choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
     choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
@@ -29,17 +29,18 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
     std::vector< std::pair<InputManager::Button, std::function<void()> > > playingStateActions;
     playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewind, this)));
     playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForward, this)));
-    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::togglePause, this)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::pauseToggle, this)));
     playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
     playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_F, std::bind(&AudiobookPlayer::stopAudiobook, this)));
     availableActions_.insert(std::make_pair(State::PLAYING, std::move(playingStateActions)));
 
     // REWINDING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > rewindingStateActions;
     rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewind, this)));
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playCurrentTrack, this)));
+    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playChosenAudiobook, this)));
     rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForward, this)));
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::togglePause, this)));
+    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::pauseToggle, this)));
     rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
     rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
     availableActions_.insert(std::make_pair(State::REWINDING, std::move(rewindingStateActions)));
@@ -47,37 +48,50 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
     // FAST_FORWARDING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > fastForwardingStateActions;
     fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewind, this)));
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playCurrentTrack, this)));
+    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playChosenAudiobook, this)));
     fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForward, this)));
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::togglePause, this)));
+    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::pauseToggle, this)));
     fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
     fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
     availableActions_.insert(std::make_pair(State::FAST_FORWARDING, std::move(fastForwardingStateActions)));
 
     // PAUSED STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > pausedStateActions;
-    pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::togglePause, this)));
+    pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::pauseToggle, this)));
     pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
     pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
     pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_F, std::bind(&AudiobookPlayer::stopAudiobook, this)));
     availableActions_.insert(std::make_pair(State::PAUSED, std::move(pausedStateActions)));
 }
 
-void AudiobookPlayer::playAudiobook(AudioTrack& audioTrack)
+void AudiobookPlayer::play(std::list<AudioTask::Element> audioTaskElements, std::function<void()> callbackFunction)
 {
-    BOOST_LOG_TRIVIAL(info) << "Playing audiotrack: " << audioTrack.getTrackName() << " (" << audioTrack.getFilePath() << ")";
-    currentlyPlayedAudioStream_ = audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({
-            voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"),
-            audioTrack
-        })).get();
+    currentAudioTask_ = audioManager_.play(audioTaskElements, callbackFunction);
+}
+
+void AudiobookPlayer::playChosenAudiobook()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    changeStateTo(State::PLAYING);
+    AudioTrack& currentAudioTrack = audioTracks_[currentTrackIndex_];
+
+    BOOST_LOG_TRIVIAL(info) << "Playing audiotrack: " << currentAudioTrack.getTrackName() << " (" << currentAudioTrack.getFilePath() << ")";
+
+    if (currentAudioTask_) currentAudioTask_->stop();
+    
     auto audiobookFinishCallback = [this]()
     {
-        currentlyPlayedAudioStream_->getAudioStreamFuture().get();
-        changeStateTo(State::CHOOSING);
-        BOOST_LOG_TRIVIAL(info) << "Finished playing audiotrack.";
-        audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook"));
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (currentState_ == State::PLAYING)
+        {
+            changeStateTo(State::CHOOSING);
+            BOOST_LOG_TRIVIAL(info) << "Finished playing audiotrack.";
+            play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook") });
+        }
     };
-    std::thread(audiobookFinishCallback).detach();
+
+    play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"), currentAudioTrack },
+        audiobookFinishCallback);
 }
 
 void AudiobookPlayer::fastForwardingTimerFunction()
@@ -92,25 +106,41 @@ void AudiobookPlayer::fastForwardingTimerFunction()
     }
 }
 
-void AudiobookPlayer::togglePause()
+void AudiobookPlayer::pauseToggle()
 {
-    BOOST_LOG_TRIVIAL(info) << "Toggling audiotrack pause: " << audioTracks_[currentTrackIndex_].getTrackName();
-    fastForwardingSpeed_ = 0;
-    if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
-    if (currentlyPlayedAudioStream_->isPaused())
+    if (currentState_ == State::PAUSED || currentState_ == State::FAST_FORWARDING || currentState_ == State::REWINDING)
     {
-        audioManager_.playSync(voiceManager_.getSynthesizedVoiceAudioTracks().at("unpausing_audiobook"));
+        if (!pausedAudioTask_) return;
+        if (!pausedAudioTask_->isPausable()) return;
+        BOOST_LOG_TRIVIAL(info) << "Toggling audiotrack pause: " << audioTracks_[currentTrackIndex_].getTrackName();
+        fastForwardingSpeed_ = 0;
+        if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
         changeStateTo(State::PLAYING);
+        pausedAudioTask_->seek(fastForwardedSeconds_);
+        fastForwardedSeconds_ = 0;
+        play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("unpausing_audiobook") });
+        currentAudioTask_->waitForEnd();
+        if (pausedAudioTask_)
+        {
+            pausedAudioTask_->pause();
+            currentAudioTask_ = pausedAudioTask_;
+        }
+        pausedAudioTask_ = nullptr;
     }
     else
     {
-        audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("pausing_audiobook"));
+        if (!currentAudioTask_) return;
+        if (!currentAudioTask_->isPausable()) return;
+        BOOST_LOG_TRIVIAL(info) << "Toggling audiotrack pause: " << audioTracks_[currentTrackIndex_].getTrackName();
+        fastForwardingSpeed_ = 0;
+        if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
         changeStateTo(State::PAUSED);
+        currentAudioTask_->seek(fastForwardedSeconds_);
+        fastForwardedSeconds_ = 0;
+        if (currentAudioTask_) currentAudioTask_->pause();
+        pausedAudioTask_ = currentAudioTask_;
+        play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("pausing_audiobook") });
     }
-    currentlyPlayedAudioStream_->seek(fastForwardedSeconds_);
-    fastForwardedSeconds_ = 0;
-    currentlyPlayedAudioStream_->pauseToggle();
-    BOOST_LOG_TRIVIAL(info) << "Paused = " << currentlyPlayedAudioStream_->isPaused();
 }
 
 void AudiobookPlayer::loadTracks()
@@ -136,7 +166,7 @@ void AudiobookPlayer::loadTracks()
 
                 if (fileExtension == "mp3" || fileExtension == "wav")
                 {
-                    AudioTrack audioTrack("../data/audiobooks/" + trackName, Config::getInstance().volumeForAudiobooks);
+                    AudioTrack audioTrack("../data/audiobooks/" + trackName, Config::getInstance().volumeForAudiobooks, AudioTrack::Type::STANDARD);
                     audioTracks_.push_back(audioTrack);
                     BOOST_LOG_TRIVIAL(info) << trackName << " loaded.";
                 }
@@ -148,34 +178,30 @@ void AudiobookPlayer::loadTracks()
 
 void AudiobookPlayer::switchToNextAudiobook()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (currentTrackIndex_ == audioTracks_.size() - 1)
         currentTrackIndex_ = 0;
     else
         ++currentTrackIndex_;
 
-    audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
-        voiceManager_.getSynthesizedVoiceAudioTracks().at("chosen_next"),
-        voiceManager_.getSynthesizedVoiceAudioTracks().at(getCurrentTrack().getTrackName())
-    }));
+    if (currentAudioTask_) currentAudioTask_->stop();
+    play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("chosen_next"), 
+        voiceManager_.getSynthesizedVoiceAudioTracks().at(getCurrentTrack().getTrackName()) 
+        });
 }
 
 void AudiobookPlayer::switchToPreviousAudiobook()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (currentTrackIndex_ == 0)
         currentTrackIndex_ = audioTracks_.size() - 1;  
     else
         --currentTrackIndex_;
 
-    audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
-        voiceManager_.getSynthesizedVoiceAudioTracks().at("chosen_previous"),
-        voiceManager_.getSynthesizedVoiceAudioTracks().at(getCurrentTrack().getTrackName())
-    }));
-}
-
-void AudiobookPlayer::playCurrentTrack()
-{
-    changeStateTo(State::PLAYING);
-    playAudiobook(audioTracks_[currentTrackIndex_]);
+    if (currentAudioTask_) currentAudioTask_->stop();
+    play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("chosen_previous"), 
+        voiceManager_.getSynthesizedVoiceAudioTracks().at(getCurrentTrack().getTrackName()) 
+        });
 }
 
 std::vector< std::pair<InputManager::Button, std::function<void()> > > & AudiobookPlayer::getAvailableActions()
@@ -185,14 +211,26 @@ std::vector< std::pair<InputManager::Button, std::function<void()> > > & Audiobo
 
 void AudiobookPlayer::rewind()
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+
     if (fastForwardingSpeed_ == 0)
     {
-        currentlyPlayedAudioStream_->pauseToggle();
+        if (!currentAudioTask_) return;
+        if (!currentAudioTask_->isPausable()) return;
+        pausedAudioTask_ = currentAudioTask_;
+        currentAudioTask_->pause();
         fastForwardingSpeed_ = -2;
         changeStateTo(State::REWINDING);
+        if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
         fastForwardingTimerThread_ = std::thread(&AudiobookPlayer::fastForwardingTimerFunction, this);
     }
-    else if (fastForwardingSpeed_ == 2) togglePause();
+    else if (fastForwardingSpeed_ == 2)
+    {
+        fastForwardingSpeed_ = 0;
+        currentAudioTask_ = pausedAudioTask_;
+        currentAudioTask_->pause();
+        changeStateTo(State::PLAYING);
+    }
     else if (fastForwardingSpeed_ < 0) fastForwardingSpeed_ *= 2;
     else if (fastForwardingSpeed_ > 0) fastForwardingSpeed_ *= 0.5f;
 
@@ -202,28 +240,37 @@ void AudiobookPlayer::rewind()
     /* Playing appropriate voice messages */
     if (fastForwardingSpeed_ == -2)
     {
-        audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
-            voiceManager_.getSynthesizedVoiceAudioTracks().at("rewinding"),
-            voiceManager_.getSynthesizedVoiceAudioTracks().at("2x")
-        }));
+        play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("rewinding"),
+            voiceManager_.getSynthesizedVoiceAudioTracks().at("2x") });
     }
     else if (fastForwardingSpeed_ != 0)
     {
-        audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at(std::to_string(std::abs(fastForwardingSpeed_)) + "x"));
+        play({ voiceManager_.getSynthesizedVoiceAudioTracks().at(std::to_string(std::abs(fastForwardingSpeed_)) + "x") });
     }
 
     BOOST_LOG_TRIVIAL(info) << "Set fast-forwardings speed to " << fastForwardingSpeed_;
 }
 void AudiobookPlayer::fastForward()
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     if (fastForwardingSpeed_ == 0)
     {
-        currentlyPlayedAudioStream_->pauseToggle();
+        if (!currentAudioTask_) return;
+        if (!currentAudioTask_->isPausable()) return;
+        pausedAudioTask_ = currentAudioTask_;
+        currentAudioTask_->pause();
         fastForwardingSpeed_ = 2;
         changeStateTo(State::FAST_FORWARDING);
+        if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
         fastForwardingTimerThread_ = std::thread(&AudiobookPlayer::fastForwardingTimerFunction, this);
     }
-    else if (fastForwardingSpeed_ == -2) togglePause();
+    else if (fastForwardingSpeed_ == -2)
+    {
+        fastForwardingSpeed_ = 0;
+        currentAudioTask_ = pausedAudioTask_;
+        currentAudioTask_->pause();
+        changeStateTo(State::PLAYING);
+    }
     else if (fastForwardingSpeed_ < 0) fastForwardingSpeed_ *= 0.5f;
     else if (fastForwardingSpeed_ > 0) fastForwardingSpeed_ *= 2;
 
@@ -233,23 +280,23 @@ void AudiobookPlayer::fastForward()
     /* Playing appropriate voice messages */
     if (fastForwardingSpeed_ == 2)
     {
-        audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
-            voiceManager_.getSynthesizedVoiceAudioTracks().at("fast_forwarding"),
-            voiceManager_.getSynthesizedVoiceAudioTracks().at("2x")
-        }));
+        play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("fast_forwarding"),
+            voiceManager_.getSynthesizedVoiceAudioTracks().at("2x") });
     }
     else if (fastForwardingSpeed_ != 0)
     {
-        audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at(std::to_string(std::abs(fastForwardingSpeed_)) + "x"));
+        play({ voiceManager_.getSynthesizedVoiceAudioTracks().at(std::to_string(std::abs(fastForwardingSpeed_)) + "x") });
     }
 
     BOOST_LOG_TRIVIAL(info) << "Set fast-forwardings speed to " << fastForwardingSpeed_;
 }
 void AudiobookPlayer::stopAudiobook()
 {
-    changeStateTo(State::CHOOSING);
-    audioManager_.playAndGetAudioStream(voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook"));
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (currentAudioTask_) currentAudioTask_->stop();
+    play( {voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook")} );
     BOOST_LOG_TRIVIAL(info) << "Audiobook stopped.";
+    currentState_ = State::CHOOSING;
 }
 
 void AudiobookPlayer::printState()

@@ -99,10 +99,11 @@ void ClockApp::playCurrentTime()
     std::cout << "hour_" + std::to_string(currentTime->tm_hour) << std::endl;
     std::cout << "minute_" + std::to_string(currentTime->tm_min) << std::endl;
 
-    audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
-        voiceManager_.getSynthesizedVoiceAudioTracks().at("hour_" + std::to_string(currentTime->tm_hour)),
-        voiceManager_.getSynthesizedVoiceAudioTracks().at("minute_" + std::to_string(currentTime->tm_min))
-    }));
+        // TODO: change to new Audio API
+    // audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
+    //     voiceManager_.getSynthesizedVoiceAudioTracks().at("hour_" + std::to_string(currentTime->tm_hour)),
+    //     voiceManager_.getSynthesizedVoiceAudioTracks().at("minute_" + std::to_string(currentTime->tm_min))
+    // }));
 }
 
 void ClockApp::playCurrentDate()
@@ -111,12 +112,13 @@ void ClockApp::playCurrentDate()
     tm result;
     tm * currentTime = localtime_r(&sec, &result);
 
-    audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
-        voiceManager_.getSynthesizedVoiceAudioTracks().at("weekday_" + std::to_string(currentTime->tm_wday + 1)),
-        voiceManager_.getSynthesizedVoiceAudioTracks().at("day_" + std::to_string(currentTime->tm_mday)),
-        voiceManager_.getSynthesizedVoiceAudioTracks().at("month_" + std::to_string(currentTime->tm_mon + 1)),
-        voiceManager_.getSynthesizedVoiceAudioTracks().at("year_" + std::to_string(currentTime->tm_year + 1900))
-    }));
+    // TODO: change to new Audio API
+    // audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
+    //     voiceManager_.getSynthesizedVoiceAudioTracks().at("weekday_" + std::to_string(currentTime->tm_wday + 1)),
+    //     voiceManager_.getSynthesizedVoiceAudioTracks().at("day_" + std::to_string(currentTime->tm_mday)),
+    //     voiceManager_.getSynthesizedVoiceAudioTracks().at("month_" + std::to_string(currentTime->tm_mon + 1)),
+    //     voiceManager_.getSynthesizedVoiceAudioTracks().at("year_" + std::to_string(currentTime->tm_year + 1900))
+    // }));
 }
 
 }

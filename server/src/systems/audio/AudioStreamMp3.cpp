@@ -3,7 +3,7 @@
 namespace Pdb
 {
 
-AudioStreamMp3::AudioStreamMp3(float& masterVolume) : AudioStream(masterVolume)
+AudioStreamMp3::AudioStreamMp3(std::atomic<float>& masterVolume) : AudioStream(masterVolume)
 {
     mpg123_init();
     int err;
@@ -21,8 +21,48 @@ AudioStreamMp3::~AudioStreamMp3()
     mpg123_exit();
 }
 
+void AudioStreamMp3::play()
+{
+    state_ = State::PLAYING;
+    volume_ = playedAudioTrack_->getVolume();
+
+    std::string path = playedAudioTrack_->getFilePath();
+    mpg123_open(mh_, path.c_str());
+    mpg123_getformat(mh_, &rate_, &channels_, &encoding_);
+    nPlayedFrames_ = 0;
+    
+    parameters_.nChannels = channels_;
+    parameters_.firstChannel = 0;
+    sampleRate_ = rate_;
+    bufferFrames_ = 256;
+    doneDecodingMp3_ = false;
+
+    BOOST_LOG_TRIVIAL(info) << "Playing mp3 audio stream. Rate: " << rate_ << ", channels: " << channels_ << ", encoding: " << encoding_;
+    BOOST_LOG_TRIVIAL(info) << "Audio track played: " << playedAudioTrack_->getTrackName();
+    if (rtAudio_->isStreamOpen()) rtAudio_->closeStream();
+    rtAudio_->openStream(&parameters_, NULL, RTAUDIO_SINT16,
+        sampleRate_, &bufferFrames_, &playCb, (void*) this);
+
+    rtAudio_->startStream();
+}
+
+void AudioStreamMp3::stop()
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+
+    BOOST_LOG_TRIVIAL(info) << "Stopping mp3 audio stream. open: " << rtAudio_->isStreamOpen() << ", running: " << rtAudio_->isStreamRunning();
+    rtAudio_->closeStream();
+    mpg123_close(mh_);
+    doneDecodingMp3_ = false;
+    state_ = State::AVAILABLE;
+    finishedPlayingCondVar_.notify_all();
+    BOOST_LOG_TRIVIAL(info) << "Stopped mp3 audio stream. open: " << rtAudio_->isStreamOpen() << ", running: " << rtAudio_->isStreamRunning();
+}
+
 void AudioStreamMp3::play(const AudioTrack& audioTrack)
 {
+    std::unique_lock<std::mutex> lock(mutex_);
+    
     volume_ = audioTrack.getVolume();
 
     std::string path = audioTrack.getFilePath();
@@ -35,7 +75,6 @@ void AudioStreamMp3::play(const AudioTrack& audioTrack)
     sampleRate_ = rate_;
     bufferFrames_ = 256;
     doneDecodingMp3_ = false;
-    audioStreamPromise_ = std::promise<AudioStream*>();
 
     BOOST_LOG_TRIVIAL(info) << "Playing mp3 audio stream. Rate: " << rate_ << ", channels: " << channels_ << ", encoding: " << encoding_;
     if (rtAudio_->isStreamOpen()) rtAudio_->closeStream();
@@ -85,11 +124,13 @@ int AudioStreamMp3::playCallback(void *outputBuffer, void *inputBuffer, unsigned
 
     if (doneDecodingMp3_ && nDecodedBytesToProcessLeft_ <= 0)
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         BOOST_LOG_TRIVIAL(info) << "Finished playing mp3 audio stream." << rtAudio_->isStreamOpen() << " " << rtAudio_->isStreamRunning();
         mpg123_close(mh_);
         doneDecodingMp3_ = false;
         BOOST_LOG_TRIVIAL(info) << "Closed audio stream successfully.";
-        audioStreamPromise_.set_value(this);
+        state_ = State::AVAILABLE;
+        finishedPlayingCondVar_.notify_all();
         return 1;
     }
 

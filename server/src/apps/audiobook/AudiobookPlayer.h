@@ -5,6 +5,7 @@
 #include "systems/input/InputManager.h"
 #include <atomic>
 #include <thread>
+#include <mutex>
 
 namespace Pdb
 {
@@ -18,22 +19,23 @@ public:
 
     void switchToNextAudiobook();
     void switchToPreviousAudiobook();
-    void playCurrentTrack();
-    void togglePause();
+    void playChosenAudiobook();
+    void pauseToggle();
     void rewind();
     void fastForward();
     void stopAudiobook();
 
+    void setCurrentAudioTask(AudioTask* audioTask) { currentAudioTask_ = audioTask; }
     void printState();
 
     std::vector< std::pair<InputManager::Button, std::function<void()> > > & getAvailableActions();
 
-    AudioTrack getCurrentTrack()                        { return audioTracks_[currentTrackIndex_]; }
+    AudioTrack& getCurrentTrack()                        { return audioTracks_[currentTrackIndex_]; }
     std::vector<AudioTrack> & getAudioTracks()          { return audioTracks_; }
 
 private:
     void loadTracks();
-    void playAudiobook(AudioTrack& audioTrack);
+    void play(std::list<AudioTask::Element> audioTaskElements, std::function<void()> callbackFunction = {});
 
     void fastForwardingTimerFunction();
 
@@ -42,7 +44,8 @@ private:
 
     int currentTrackIndex_;
     std::vector<AudioTrack> audioTracks_;
-    AudioStream* currentlyPlayedAudioStream_;
+    AudioTask* currentAudioTask_;
+    AudioTask* pausedAudioTask_;
 
     int fastForwardingSpeed_;
     std::atomic<int> fastForwardedSeconds_;
@@ -52,6 +55,8 @@ private:
 
     State currentState_;
     void changeStateTo(State destinationState)          { currentState_ = destinationState; }
+
+    std::mutex mutex_;
 };
 
 }
