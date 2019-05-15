@@ -13,6 +13,11 @@ AudiobookApp::AudiobookApp(VoiceManager& voiceManager)
 void AudiobookApp::init()
 {
     synthesizeVoiceMessages();
+    AudioTask* initialAudioTask = audioManager_.play({
+        voiceManager_.getSynthesizedVoiceAudioTracks().at("choosing_audiobooks"),
+        voiceManager_.getSynthesizedVoiceAudioTracks().at(audiobookPlayer_.getCurrentTrack().getTrackName())
+    });
+    audiobookPlayer_.setCurrentAudioTask(initialAudioTask);
     BOOST_LOG_TRIVIAL(info) << "Initialized AudiobookApp.";
 }
 
@@ -49,12 +54,7 @@ void AudiobookApp::synthesizeVoiceMessages()
 void AudiobookApp::appLoopFunction()
 {
     BOOST_LOG_TRIVIAL(info) << "Starting AudiobookApp loop function.";
-
-    audioManager_.playMultipleAndGetLastAudioStream(std::vector<AudioTrack>({ 
-        voiceManager_.getSynthesizedVoiceAudioTracks().at("choosing_audiobooks"),
-        voiceManager_.getSynthesizedVoiceAudioTracks().at(audiobookPlayer_.getCurrentTrack().getTrackName())
-     }));
-
+        
     while(true)
     {
         inputManager_.update();
@@ -68,6 +68,7 @@ void AudiobookApp::appLoopFunction()
         if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_X))
         {
             audiobookPlayer_.printState();
+            audioManager_.printAllStreamsInfo();
             BOOST_LOG_TRIVIAL(info) << availableActions.size();
         }
     }

@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.7.2)
 project(pdbServer)
 set(CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 # Platform specific variables
 if(WIN32)
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -50,6 +52,8 @@ set(PDB_SERVER_SOURCES
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/input/InputManager.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioManager.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioManager.h"
+    "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioTask.cpp"
+    "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioTask.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioTrack.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioTrack.h"
     "${CMAKE_CURRENT_LIST_DIR}/src/systems/audio/AudioStream.cpp"

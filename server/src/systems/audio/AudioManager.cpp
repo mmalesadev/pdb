@@ -18,47 +18,47 @@ AudioManager::AudioManager(const size_t nMp3AudioStreams, const size_t nWavAudio
         mp3AudioStreams_.push_back(std::make_unique<AudioStreamMp3>(masterVolume_));
     for (int i = 0; i < nWavAudioStreams; ++i)
         wavAudioStreams_.push_back(std::make_unique<AudioStreamWav>(masterVolume_));
+
+    for (int i = 0; i < nMp3AudioStreams + nWavAudioStreams; ++i)
+        audioTaskPool_.push_back(std::make_unique<AudioTask>());
 }
 
-AudioStream* AudioManager::playAndGetAudioStream(const AudioTrack& audioTrack)
+AudioTask* AudioManager::play(std::list<AudioTask::Element> audioTaskElements, std::function<void()> callbackFunction)
 {
-    BOOST_LOG_TRIVIAL(info) << "Playing " << audioTrack.getFilePath() << ".";
+    std::lock_guard<std::mutex> lock(mutex_);
 
-    AudioStream* foundStream = findFreeStream(audioTrack);
+    AudioTask* freeAudioTask = getFreeAudioTaskFromPool();
+    if (!freeAudioTask) return nullptr;
 
-    if(foundStream)
+    AudioStream* freeStream = nullptr;
+
+    for (auto& audioTaskElement : audioTaskElements)
     {
-        foundStream->play(audioTrack);
+        if (audioTaskElement.hasTrack())
+        {
+            freeStream = findFreeStream(*audioTaskElement.getTrack());
+            if (!freeStream) break;
+            freeStream->setPlayedAudioTrack(audioTaskElement.getTrack());
+            audioTaskElement.setStream(freeStream);
+        }
     }
 
-    return foundStream;
-}
-
-void AudioManager::playSync(const AudioTrack& audioTrack)
-{
-    BOOST_LOG_TRIVIAL(info) << "Playing " << audioTrack.getFilePath() << ".";
-
-    playAndGetAudioStream(audioTrack)->getAudioStreamFuture().get();
-}
-
-std::future<AudioStream*> AudioManager::playMultipleAndGetLastAudioStream(const std::vector<AudioTrack>& audioTracks)
-{
-    BOOST_LOG_TRIVIAL(info) << "Playing multiple audio tracks.";
-    std::shared_ptr<std::promise<AudioStream*>> lastAudioStream = std::make_shared<std::promise<AudioStream*>>();
-
-    auto audioStreamChainPlayFunction = [this](const std::vector<AudioTrack> audioTracks, std::shared_ptr<std::promise<AudioStream*>> lastAudioStream)
+    if (freeStream)
     {
-        size_t nAudioTracks = audioTracks.size();
-        for (int i = 0; i < nAudioTracks-1; ++i)
+        freeAudioTask->start(audioTaskElements, callbackFunction);
+        return freeAudioTask;
+    }
+    else    // cleanup
+    {
+        for (auto& audioTaskElement : audioTaskElements)
         {
-            playAndGetAudioStream(audioTracks[i])->getAudioStreamFuture().get();
+            if (audioTaskElement.hasStream())
+            {
+                audioTaskElement.getStream()->makeAvailable();
+            }
         }
-        lastAudioStream->set_value(playAndGetAudioStream(audioTracks[nAudioTracks-1]));
-    };
-
-    std::thread(audioStreamChainPlayFunction, audioTracks, lastAudioStream).detach();
-
-    return lastAudioStream->get_future();
+        return nullptr;
+    }
 }
 
 int AudioManager::getFreeWavAudioStreamCount() const
@@ -77,26 +77,46 @@ int AudioManager::getFreeMp3AudioStreamCount() const
 
 void AudioManager::increaseMasterVolume()
 {
-    if (masterVolume_ <= 0.9)
-        masterVolume_ += 0.1;
+    if (masterVolume_ <= 0.9f)
+        masterVolume_.store(masterVolume_ + 0.1f);
 }
 
 void AudioManager::decreaseMasterVolume()
 {
-    if (masterVolume_ >= 0.1)
-        masterVolume_ -= 0.1;
+    if (masterVolume_ >= 0.1f)
+        masterVolume_.store(masterVolume_ - 0.1f);
 }
 
 void AudioManager::printAllStreamsInfo() const
 {
     for (auto& stream : mp3AudioStreams_)
     {
-        BOOST_LOG_TRIVIAL(debug) << "mp3 stream isAvailable=" << stream->isAvailable();
+        BOOST_LOG_TRIVIAL(info) << "mp3 stream isAvailable=" << stream->isAvailable() << " " << stream->getPlayedAudioTrackName();
     }
     for (auto& stream : wavAudioStreams_)
     {
-        BOOST_LOG_TRIVIAL(debug) << "wav stream isAvailable=" << stream->isAvailable();
+        BOOST_LOG_TRIVIAL(info) << "wav stream isAvailable=" << stream->isAvailable();
     }
+}
+
+
+AudioTask* AudioManager::getFreeAudioTaskFromPool() const
+{
+    AudioTask* foundTask = nullptr;
+    for (auto& audioTask : audioTaskPool_)
+    {
+        if (audioTask->isAvailable())
+        {
+            foundTask = audioTask.get();
+            break;
+        }
+    }
+
+    if (!foundTask)
+    {
+        BOOST_LOG_TRIVIAL(error) << "No AudioTasks left in pool.";
+    }
+    return foundTask;
 }
 
 AudioStream* AudioManager::findFreeStream(const AudioTrack& audioTrack)
@@ -120,7 +140,11 @@ AudioStream* AudioManager::findFreeStream(const AudioTrack& audioTrack)
         return foundStream;
     }
 
-    if(!foundStream)
+    if (foundStream)
+    {
+        foundStream->reserve();
+    }
+    else
     {
         BOOST_LOG_TRIVIAL(error) << "No free audio stream found. Current free mp3 audio stream count: " << getFreeMp3AudioStreamCount()
             << ". Current free wav audio stream count: " << getFreeWavAudioStreamCount();

@@ -9,9 +9,11 @@ namespace Pdb
 class AudioStreamMp3 : public AudioStream 
 {
 public:
-    AudioStreamMp3(float& masterVolume);
+    AudioStreamMp3(std::atomic<float>& masterVolume);
     ~AudioStreamMp3();
 
+    void play() override;
+    void stop() override;
     void play(const AudioTrack& audioTrack) override;
     int playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, 
         double streamTime, RtAudioStreamStatus status) override;

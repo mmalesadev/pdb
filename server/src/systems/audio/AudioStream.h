@@ -5,6 +5,8 @@
 
 #include <boost/log/trivial.hpp>
 #include <future>
+#include <mutex>
+#include <condition_variable>
 
 namespace Pdb
 {
@@ -12,9 +14,28 @@ namespace Pdb
 class AudioStream
 {
 public:
-    AudioStream(float& masterVolume);
+    AudioStream(std::atomic<float>& masterVolume);
     virtual ~AudioStream() { };
 
+    /* TODO: clean */
+    /* NEW STUFF */
+    virtual void play() = 0;
+    virtual void stop() = 0;
+
+    void setPlayedAudioTrack(AudioTrack* playedAudioTrack) { playedAudioTrack_ = playedAudioTrack; }
+
+    std::string getPlayedAudioTrackName() const {  if(playedAudioTrack_) return playedAudioTrack_->getTrackName(); else return std::string(""); }
+
+    void waitForEnd();
+    
+    std::condition_variable finishedPlayingCondVar_;
+
+protected:
+    AudioTrack* playedAudioTrack_;
+
+    /* ENDOF NEW STUFF */
+
+public:
     virtual void play(const AudioTrack& audioTrack) = 0;
     virtual int playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status) = 0;
 
@@ -22,16 +43,17 @@ public:
 
     void pauseToggle();
 
+    void reserve();
+    void makeAvailable();
+    bool isPausable() const;
     bool isPaused() const { return state_ == State::PAUSED; }
-    bool isAvailable() const { return !rtAudio_->isStreamRunning() && !isPaused(); }
+    bool isAvailable() const { return state_ == State::AVAILABLE; }
 
     void setVolume(float value) { volume_ = value; }
     float getVolume() const { return volume_; }
 
-    std::future<AudioStream*> getAudioStreamFuture() { return audioStreamPromise_.get_future(); }
-
 protected:
-    enum class State { AVAILABLE, PLAYING, PAUSED };
+    enum class State { AVAILABLE, RESERVED, PLAYING, PAUSED };
 
     std::unique_ptr<RtAudio> rtAudio_;
     RtAudio::StreamParameters parameters_;
@@ -39,10 +61,10 @@ protected:
     unsigned int bufferFrames_;
 
     State state_;
-    float& masterVolume_;
+    std::atomic<float>& masterVolume_;
     float volume_;
-
-    std::promise<AudioStream*> audioStreamPromise_;
+    
+    std::mutex mutex_;
 };
 
 int playCb(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
