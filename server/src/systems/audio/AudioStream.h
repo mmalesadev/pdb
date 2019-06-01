@@ -17,29 +17,18 @@ public:
     AudioStream(std::atomic<float>& masterVolume);
     virtual ~AudioStream() { };
 
-    /* TODO: clean */
-    /* NEW STUFF */
     virtual void play() = 0;
     virtual void stop() = 0;
+    virtual void play(const AudioTrack& audioTrack) = 0;
+    virtual int playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status) = 0;
+
+    virtual void seek(int offsetInSeconds) = 0;
 
     void setPlayedAudioTrack(AudioTrack* playedAudioTrack) { playedAudioTrack_ = playedAudioTrack; }
 
     std::string getPlayedAudioTrackName() const {  if(playedAudioTrack_) return playedAudioTrack_->getTrackName(); else return std::string(""); }
 
     void waitForEnd();
-    
-    std::condition_variable finishedPlayingCondVar_;
-
-protected:
-    AudioTrack* playedAudioTrack_;
-
-    /* ENDOF NEW STUFF */
-
-public:
-    virtual void play(const AudioTrack& audioTrack) = 0;
-    virtual int playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status) = 0;
-
-    virtual void seek(int offsetInSeconds) = 0;
 
     void pauseToggle();
 
@@ -54,6 +43,10 @@ public:
 
 protected:
     enum class State { AVAILABLE, RESERVED, PLAYING, PAUSED };
+
+    AudioTrack* playedAudioTrack_;
+    
+    std::condition_variable finishedPlayingCondVar_;
 
     std::unique_ptr<RtAudio> rtAudio_;
     RtAudio::StreamParameters parameters_;
