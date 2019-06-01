@@ -16,6 +16,8 @@ public:
 
 private:
     void synthesizeClockReadings();
+
+    AudioTask * currentAudioTask_;
 };
 
 }
