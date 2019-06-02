@@ -17,6 +17,7 @@ Config::Config()
 	}
 	
 	loggingLevel = pt_.get<std::string>("General.loggingLevel");
+	inputMode = pt_.get<std::string>("General.inputMode");
 	volumeForAwsSynthesized = pt_.get<float>("SynthesizedAudio.volume");
 	volumeForAudiobooks = pt_.get<float>("AudiobookAudio.volume");
 	masterVolume = pt_.get<float>("MasterVolume.masterVolume");

@@ -104,10 +104,20 @@ void ClockApp::appLoopFunction()
     {   
         inputManager_.update();
 
-        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpAdd)) audioManager_.increaseMasterVolume();
-        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) audioManager_.decreaseMasterVolume();
-        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpMultiply)) playCurrentDate();
-        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) playCurrentTime();
+        if (Config::getInstance().inputMode == "debug")
+        {
+            if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_UP)) audioManager_.increaseMasterVolume();
+            if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_DOWN)) audioManager_.decreaseMasterVolume();
+            if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_R)) playCurrentDate();
+            if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_T)) playCurrentTime();
+        }
+        else if (Config::getInstance().inputMode == "prod")
+        {
+            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpAdd)) audioManager_.increaseMasterVolume();
+            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) audioManager_.decreaseMasterVolume();
+            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpMultiply)) playCurrentDate();
+            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) playCurrentTime();
+        }
     }
 }
 

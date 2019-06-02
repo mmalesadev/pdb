@@ -9,7 +9,7 @@ namespace Pdb
 class InputManager
 {
 public:
-    enum Button { BUTTON_Q, BUTTON_W, BUTTON_E, BUTTON_S, BUTTON_X, BUTTON_UP, BUTTON_DOWN, BUTTON_F, BUTTON_T, BUTTON_D,
+    enum Button { BUTTON_Q, BUTTON_W, BUTTON_E, BUTTON_S, BUTTON_A, BUTTON_R, BUTTON_X, BUTTON_UP, BUTTON_DOWN, BUTTON_F, BUTTON_T, BUTTON_D,
                     KeyKpEqual, KeyKpDivide, KeyKpMultiply, KeyKpSubtract,
                     KeyKpAdd, KeyKpEnter, KeyKpDelete, KeyKpInsert, 
                     KeyKpEnd, KeyKpDown, KeyKpPageDown, 
