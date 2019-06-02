@@ -36,6 +36,7 @@ public:
 
     bool isAvailable() const { return state_ == State::AVAILABLE; };
     bool isPausable() const;
+    bool isPaused() const;
     void start(std::list<AudioTask::Element> taskElements, std::function<void()> callbackFunction = {});
     void stop();
     void pause();
