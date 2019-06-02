@@ -52,8 +52,9 @@ void VoiceManager::synthesizeVoiceMessage(const std::string& message, const std:
         voiceFile.open(filePath.c_str(), std::ios::out | std::ios::binary);
         voiceFile.write(GetStreamBytes(audioStream), GetStreamSize(audioStream));
         voiceFile.close();
+        lock.lock();
         synthesizedVoiceAudioTracks_.insert(std::make_pair(outputTrackName, AudioTrack(synthesizedVoiceMessageFilePath.c_str(), Config::getInstance().volumeForAwsSynthesized, AudioTrack::Type::VOICE_MESSAGE)));
-
+        lock.unlock();
         BOOST_LOG_TRIVIAL(info) << "Saving to file done.";
     }
     else

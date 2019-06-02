@@ -34,7 +34,9 @@ void InputManager::init()
 
     map_->MapBool(Button::BUTTON_Q, keyboardId_, gainput::KeyQ);
     map_->MapBool(Button::BUTTON_W, keyboardId_, gainput::KeyW);
+    map_->MapBool(Button::BUTTON_A, keyboardId_, gainput::KeyA);
     map_->MapBool(Button::BUTTON_S, keyboardId_, gainput::KeyS);
+    map_->MapBool(Button::BUTTON_R, keyboardId_, gainput::KeyR);
     map_->MapBool(Button::BUTTON_E, keyboardId_, gainput::KeyE);
     map_->MapBool(Button::BUTTON_X, keyboardId_, gainput::KeyX);
     map_->MapBool(Button::BUTTON_UP, keyboardId_, gainput::KeyUp);

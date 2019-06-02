@@ -23,6 +23,7 @@ private:
 
 public:
     std::string loggingLevel;
+    std::string inputMode;
     float volumeForAwsSynthesized;
     float volumeForAudiobooks;
     float masterVolume;

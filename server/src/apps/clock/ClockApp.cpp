@@ -30,38 +30,33 @@ void ClockApp::synthesizeClockReadings()
         {
             if (hour == 0)
             {
-                voiceManager_.synthesizeVoiceMessage("<speak>północ. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings/", "time_0_0");
+                voiceManager_.synthesizeVoiceMessage("<speak>północ. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings", "time_0_0");
                 for (int minute = 1; minute < 59; ++minute)
-                    voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(minute) + " po północy. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings/", "time_0_" + std::to_string(minute));
+                    voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(minute) + " po północy. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings", "time_0_" + std::to_string(minute));
             }
             else
             {
                 for (int minute = 0; minute < 59; ++minute)
                 {
                     if (minute < 10)
-                        voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(hour) + ":0" + std::to_string(minute) + "</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings/", "time_" + std::to_string(hour) + "_" + std::to_string(minute));
+                        voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(hour) + ":0" + std::to_string(minute) + "</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings", "time_" + std::to_string(hour) + "_" + std::to_string(minute));
                     else
-                        voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(hour) + ":" + std::to_string(minute) + "</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings/", "time_" + std::to_string(hour) + "_" + std::to_string(minute));
+                        voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(hour) + ":" + std::to_string(minute) + "</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings", "time_" + std::to_string(hour) + "_" + std::to_string(minute));
                 }
             }
         }
     };
-    
-    std::vector<std::thread> synthesizingThreadVector(24);
-    for (int hour = 0; hour < 24; ++hour)
-        synthesizingThreadVector[hour] = std::thread(timeSynthesizingFunction, hour, hour);
 
-    for (int hour = 0; hour < 24; ++hour)
-        synthesizingThreadVector[hour].join();
+    timeSynthesizingFunction(0, 23);
 
     /* Synthesizing weekday readings */
-    voiceManager_.synthesizeVoiceMessage("<speak>niedziela.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays/", "weekday_1");
-    voiceManager_.synthesizeVoiceMessage("<speak>poniedziałek.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays/", "weekday_2");
-    voiceManager_.synthesizeVoiceMessage("<speak>wtorek.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays/", "weekday_3");    
-    voiceManager_.synthesizeVoiceMessage("<speak>środa.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays/", "weekday_4");
-    voiceManager_.synthesizeVoiceMessage("<speak>czwartek.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays/", "weekday_5");
-    voiceManager_.synthesizeVoiceMessage("<speak>piątek.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays/", "weekday_6");
-    voiceManager_.synthesizeVoiceMessage("<speak>sobota.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays/", "weekday_7");
+    voiceManager_.synthesizeVoiceMessage("<speak>niedziela.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays", "weekday_1");
+    voiceManager_.synthesizeVoiceMessage("<speak>poniedziałek.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays", "weekday_2");
+    voiceManager_.synthesizeVoiceMessage("<speak>wtorek.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays", "weekday_3");    
+    voiceManager_.synthesizeVoiceMessage("<speak>środa.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays", "weekday_4");
+    voiceManager_.synthesizeVoiceMessage("<speak>czwartek.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays", "weekday_5");
+    voiceManager_.synthesizeVoiceMessage("<speak>piątek.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays", "weekday_6");
+    voiceManager_.synthesizeVoiceMessage("<speak>sobota.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/weekdays", "weekday_7");
 
     /* Synthesizing day with month readings */
 
@@ -77,29 +72,29 @@ void ClockApp::synthesizeClockReadings()
         else
             dayReadingStr = "<speak>" + std::to_string(dayIndex) + "-y ";
 
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "stycznia.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_1");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "lutego.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_2"); 
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "marca.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_3");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "kwietnia.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_4");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "maja.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_5");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "czerwca.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_6");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "lipca.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_7");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "sierpnia.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_8");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "września.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_9");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "października.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_10");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "listopada.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_11");
-        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "grudnia.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months/", "day_" + std::to_string(dayIndex) + "_month_12");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "stycznia.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_1");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "lutego.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_2"); 
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "marca.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_3");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "kwietnia.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_4");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "maja.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_5");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "czerwca.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_6");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "lipca.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_7");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "sierpnia.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_8");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "września.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_9");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "października.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_10");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "listopada.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_11");
+        voiceManager_.synthesizeVoiceMessage(dayReadingStr + "grudnia.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/days_with_months", "day_" + std::to_string(dayIndex) + "_month_12");
     }
 
     /* Synthesizing year readings */
     for (int yearIndex = 0; yearIndex <= 100; ++yearIndex)
     {
         if ((2019 + yearIndex) % 10 == 2 || (2019 + yearIndex) % 10 == 3)
-            voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(2019 + yearIndex) + "-i.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/years/", "year_" + std::to_string(2019 + yearIndex));
+            voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(2019 + yearIndex) + "-i.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/years", "year_" + std::to_string(2019 + yearIndex));
         else if ((2019 + yearIndex) % 10 == 4)
-            voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(2019 + yearIndex) + "-ty.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/years/", "year_" + std::to_string(2019 + yearIndex));
+            voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(2019 + yearIndex) + "-ty.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/years", "year_" + std::to_string(2019 + yearIndex));
         else
-            voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(2019 + yearIndex) + "-y.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/years/", "year_" + std::to_string(2019 + yearIndex));   
+            voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(2019 + yearIndex) + "-y.</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/date_readings/years", "year_" + std::to_string(2019 + yearIndex));   
     }
 }
 
@@ -109,10 +104,20 @@ void ClockApp::appLoopFunction()
     {   
         inputManager_.update();
 
-        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpAdd)) audioManager_.increaseMasterVolume();
-        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) audioManager_.decreaseMasterVolume();
-        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpMultiply)) playCurrentDate();
-        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) playCurrentTime();
+        if (Config::getInstance().inputMode == "debug")
+        {
+            if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_UP)) audioManager_.increaseMasterVolume();
+            if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_DOWN)) audioManager_.decreaseMasterVolume();
+            if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_R)) playCurrentDate();
+            if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_T)) playCurrentTime();
+        }
+        else if (Config::getInstance().inputMode == "prod")
+        {
+            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpAdd)) audioManager_.increaseMasterVolume();
+            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) audioManager_.decreaseMasterVolume();
+            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpMultiply)) playCurrentDate();
+            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) playCurrentTime();
+        }
     }
 }
 
