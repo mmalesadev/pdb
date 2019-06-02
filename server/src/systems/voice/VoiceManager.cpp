@@ -22,6 +22,7 @@ VoiceManager::~VoiceManager()
 
 void VoiceManager::synthesizeVoiceMessage(const std::string& message, const std::string& outputDirectory, const std::string& outputTrackName)
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     boost::filesystem::path synthesizedVoiceMessageFilePath(outputDirectory + "/" + outputTrackName + ".mp3");
     if (boost::filesystem::exists(synthesizedVoiceMessageFilePath))
     {
@@ -35,9 +36,10 @@ void VoiceManager::synthesizeVoiceMessage(const std::string& message, const std:
     Aws::Polly::PollyClient pollyClient;
     Aws::Polly::Model::SynthesizeSpeechRequest speechRequest;
     speechRequest.SetTextType(Aws::Polly::Model::TextType::ssml);
-    speechRequest.SetVoiceId(Aws::Polly::Model::VoiceId::Maja);
+    speechRequest.SetVoiceId(Aws::Polly::Model::VoiceId::Ewa);
     speechRequest.SetOutputFormat(Aws::Polly::Model::OutputFormat::mp3);
     speechRequest.SetText(message.c_str());
+    lock.unlock();
     auto result = pollyClient.SynthesizeSpeech(speechRequest);
 
     if (result.IsSuccess())

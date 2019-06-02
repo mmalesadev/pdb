@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <unordered_map>
+#include <mutex>
 
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentialsProviderChain.h>
@@ -37,6 +38,8 @@ private:
     Aws::SDKOptions options_;
 
     std::unordered_map<std::string, AudioTrack> synthesizedVoiceAudioTracks_;
+
+    std::mutex mutex_;
 };
 
 }
