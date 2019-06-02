@@ -42,6 +42,23 @@ void InputManager::init()
     map_->MapBool(Button::BUTTON_F, keyboardId_, gainput::KeyF);
     map_->MapBool(Button::BUTTON_T, keyboardId_, gainput::KeyT);
     map_->MapBool(Button::BUTTON_D, keyboardId_, gainput::KeyD);
+    map_->MapBool(Button::KeyKpEqual, keyboardId_, gainput::KeyKpEqual);
+    map_->MapBool(Button::KeyKpDivide, keyboardId_, gainput::KeyKpDivide);
+    map_->MapBool(Button::KeyKpMultiply, keyboardId_, gainput::KeyKpMultiply);
+    map_->MapBool(Button::KeyKpSubtract, keyboardId_, gainput::KeyKpSubtract);
+    map_->MapBool(Button::KeyKpAdd, keyboardId_, gainput::KeyKpAdd);
+    map_->MapBool(Button::KeyKpEnter, keyboardId_, gainput::KeyKpEnter);
+    map_->MapBool(Button::KeyKpInsert, keyboardId_, gainput::KeyKpInsert);
+    map_->MapBool(Button::KeyKpEnd, keyboardId_, gainput::KeyKpEnd);
+    map_->MapBool(Button::KeyKpDown, keyboardId_, gainput::KeyKpDown);
+    map_->MapBool(Button::KeyKpPageDown, keyboardId_, gainput::KeyKpPageDown);
+    map_->MapBool(Button::KeyKpLeft, keyboardId_, gainput::KeyKpLeft);
+    map_->MapBool(Button::KeyKpBegin, keyboardId_, gainput::KeyKpBegin);
+    map_->MapBool(Button::KeyKpRight, keyboardId_, gainput::KeyKpRight);
+    map_->MapBool(Button::KeyKpHome, keyboardId_, gainput::KeyKpHome);
+    map_->MapBool(Button::KeyKpUp, keyboardId_, gainput::KeyKpUp);
+    map_->MapBool(Button::KeyKpPageUp, keyboardId_, gainput::KeyKpPageUp);
+    map_->MapBool(Button::KeyKpDelete, keyboardId_, gainput::KeyKpDelete);
 
     BOOST_LOG_TRIVIAL(info) << "Initialized InputManager.";
 }

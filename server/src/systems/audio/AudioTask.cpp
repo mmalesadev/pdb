@@ -60,6 +60,16 @@ bool AudioTask::isPausable() const
     return false;
 }
 
+bool AudioTask::isPaused() const
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (audioTaskElements_.empty()) return false;
+    auto taskElement = audioTaskElements_.front();
+    AudioStream* currentStream = taskElement.getStream();
+    if (currentStream && currentStream->isPaused()) return true;
+    return false;
+}
+
 void AudioTask::pause()
 {
     std::unique_lock<std::mutex> lock(mutex_);

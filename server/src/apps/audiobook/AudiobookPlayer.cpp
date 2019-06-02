@@ -18,49 +18,49 @@ AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voice
 
     // CHOOSING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > choosingStateActions;
-    choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::switchToPreviousAudiobook, this)));
-    choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playChosenAudiobook, this)));
-    choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::switchToNextAudiobook, this)));
-    choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
-    choosingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
+    choosingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpLeft, std::bind(&AudiobookPlayer::switchToPreviousAudiobook, this)));
+    choosingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpBegin, std::bind(&AudiobookPlayer::playChosenAudiobook, this)));
+    choosingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpRight, std::bind(&AudiobookPlayer::switchToNextAudiobook, this)));
+    choosingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpAdd, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
+    choosingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpSubtract, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
     availableActions_.insert(std::make_pair(State::CHOOSING, std::move(choosingStateActions)));
 
     // PLAYING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > playingStateActions;
-    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewind, this)));
-    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForward, this)));
-    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::pauseToggle, this)));
-    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
-    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
-    playingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_F, std::bind(&AudiobookPlayer::stopAudiobook, this)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpLeft, std::bind(&AudiobookPlayer::rewind, this)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpRight, std::bind(&AudiobookPlayer::fastForward, this)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpBegin, std::bind(&AudiobookPlayer::pauseToggle, this)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpAdd, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpSubtract, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
+    playingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpInsert, std::bind(&AudiobookPlayer::stopAudiobook, this)));
     availableActions_.insert(std::make_pair(State::PLAYING, std::move(playingStateActions)));
 
     // REWINDING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > rewindingStateActions;
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewind, this)));
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playChosenAudiobook, this)));
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForward, this)));
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::pauseToggle, this)));
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
-    rewindingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
+    rewindingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpLeft, std::bind(&AudiobookPlayer::rewind, this)));
+    rewindingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpRight, std::bind(&AudiobookPlayer::fastForward, this)));
+    rewindingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpBegin, std::bind(&AudiobookPlayer::pauseToggle, this)));
+    rewindingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpAdd, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
+    rewindingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpSubtract, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
     availableActions_.insert(std::make_pair(State::REWINDING, std::move(rewindingStateActions)));
 
     // FAST_FORWARDING STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > fastForwardingStateActions;
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_Q, std::bind(&AudiobookPlayer::rewind, this)));
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_W, std::bind(&AudiobookPlayer::playChosenAudiobook, this)));
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_E, std::bind(&AudiobookPlayer::fastForward, this)));
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::pauseToggle, this)));
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
-    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
+    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpLeft, std::bind(&AudiobookPlayer::rewind, this)));
+    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpRight, std::bind(&AudiobookPlayer::fastForward, this)));
+    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpBegin, std::bind(&AudiobookPlayer::pauseToggle, this)));
+    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpAdd, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
+    fastForwardingStateActions.push_back(std::make_pair(InputManager::Button::KeyKpSubtract, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
     availableActions_.insert(std::make_pair(State::FAST_FORWARDING, std::move(fastForwardingStateActions)));
 
     // PAUSED STATE
     std::vector< std::pair<InputManager::Button, std::function<void()> > > pausedStateActions;
-    pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_S, std::bind(&AudiobookPlayer::pauseToggle, this)));
-    pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_UP, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
-    pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_DOWN, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
-    pausedStateActions.push_back(std::make_pair(InputManager::Button::BUTTON_F, std::bind(&AudiobookPlayer::stopAudiobook, this)));
+    pausedStateActions.push_back(std::make_pair(InputManager::Button::KeyKpLeft, std::bind(&AudiobookPlayer::rewind, this)));
+    pausedStateActions.push_back(std::make_pair(InputManager::Button::KeyKpRight, std::bind(&AudiobookPlayer::fastForward, this)));
+    pausedStateActions.push_back(std::make_pair(InputManager::Button::KeyKpBegin, std::bind(&AudiobookPlayer::pauseToggle, this)));
+    pausedStateActions.push_back(std::make_pair(InputManager::Button::KeyKpAdd, std::bind(&AudioManager::increaseMasterVolume, &audioManager_)));
+    pausedStateActions.push_back(std::make_pair(InputManager::Button::KeyKpSubtract, std::bind(&AudioManager::decreaseMasterVolume, &audioManager_)));
+    pausedStateActions.push_back(std::make_pair(InputManager::Button::KeyKpInsert, std::bind(&AudiobookPlayer::stopAudiobook, this)));
     availableActions_.insert(std::make_pair(State::PAUSED, std::move(pausedStateActions)));
 }
 
@@ -212,13 +212,19 @@ std::vector< std::pair<InputManager::Button, std::function<void()> > > & Audiobo
 void AudiobookPlayer::rewind()
 {
     std::unique_lock<std::mutex> lock(mutex_);
+    AudioTask* checkedAudioTask = nullptr;
+    if (currentState_ == State::PLAYING) checkedAudioTask = currentAudioTask_;
+    else if (currentState_ == State::PAUSED) checkedAudioTask = pausedAudioTask_;
 
     if (fastForwardingSpeed_ == 0)
     {
-        if (!currentAudioTask_) return;
-        if (!currentAudioTask_->isPausable()) return;
+        if (!checkedAudioTask) return;
+        if (!checkedAudioTask->isPausable()) return;
         pausedAudioTask_ = currentAudioTask_;
-        currentAudioTask_->pause();
+        if (!checkedAudioTask->isPaused())
+        {
+            pausedAudioTask_ = currentAudioTask_;checkedAudioTask->pause();
+        }
         fastForwardingSpeed_ = -2;
         changeStateTo(State::REWINDING);
         if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
@@ -253,12 +259,19 @@ void AudiobookPlayer::rewind()
 void AudiobookPlayer::fastForward()
 {
     std::unique_lock<std::mutex> lock(mutex_);
+    AudioTask* checkedAudioTask = nullptr;
+    if (currentState_ == State::PLAYING) checkedAudioTask = currentAudioTask_;
+    else if (currentState_ == State::PAUSED) checkedAudioTask = pausedAudioTask_;
+
     if (fastForwardingSpeed_ == 0)
     {
-        if (!currentAudioTask_) return;
-        if (!currentAudioTask_->isPausable()) return;
-        pausedAudioTask_ = currentAudioTask_;
-        currentAudioTask_->pause();
+        if (!checkedAudioTask) return;
+        if (!checkedAudioTask->isPausable()) return;
+        if (!checkedAudioTask->isPaused())
+        {
+            pausedAudioTask_ = currentAudioTask_;
+            checkedAudioTask->pause();
+        }
         fastForwardingSpeed_ = 2;
         changeStateTo(State::FAST_FORWARDING);
         if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();

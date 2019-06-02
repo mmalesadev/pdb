@@ -108,10 +108,11 @@ void ClockApp::appLoopFunction()
     while (true)
     {   
         inputManager_.update();
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_UP)) audioManager_.increaseMasterVolume();
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_DOWN)) audioManager_.decreaseMasterVolume();
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_T)) playCurrentTime();
-        if (inputManager_.isButtonPressed(InputManager::Button::BUTTON_D)) playCurrentDate();
+
+        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpAdd)) audioManager_.increaseMasterVolume();
+        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) audioManager_.decreaseMasterVolume();
+        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpMultiply)) playCurrentDate();
+        if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) playCurrentTime();
     }
 }
 
