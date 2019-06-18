@@ -66,7 +66,12 @@ int AudioStreamWav::playCallback(void *outputBuffer, void *inputBuffer, unsigned
     return 0;
 }
 
-void AudioStreamWav::seek(int offsetInSeconds)
+int AudioStreamWav::currentPositionInMilliseconds()
+{
+    return 0;
+}
+
+void AudioStreamWav::seek(int offsetInMilliseconds)
 {
 }
 

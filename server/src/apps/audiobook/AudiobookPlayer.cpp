@@ -2,6 +2,9 @@
 #include <boost/log/trivial.hpp>
 #include <future>
 #include <memory>
+#include <iterator>
+#include <sstream>
+#include <fstream>
 #include <boost/filesystem.hpp>
 
 namespace filesystem = boost::filesystem;
@@ -10,9 +13,12 @@ namespace Pdb
 {
 
 AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voiceManager) 
-    : audioManager_(audioManager), voiceManager_(voiceManager), fastForwardingSpeed_(0), currentAudioTask_(nullptr), pausedAudioTask_(nullptr)
+    : audioManager_(audioManager), voiceManager_(voiceManager), fastForwardingSpeed_(0), currentAudioTask_(nullptr), pausedAudioTask_(nullptr),
+    trackInfoPattern_(std::string("^([0-9a-zA-Z_[:punct:]]+)([[:space:]])([0-9]|[1-9][0-9]*)$"))
 {
     this->loadTracks();
+    this->loadTracksInfo();
+    this->synchronizeTracksInfo();
     currentTrackIndex_ = 0;
     currentState_ = State::CHOOSING;
 
@@ -117,9 +123,7 @@ void AudiobookPlayer::playChosenAudiobook()
             play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook") });
         }
     };
-
-    play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"), currentAudioTrack },
-        audiobookFinishCallback);
+    play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("playing_audiobook"), currentAudioTrack }, audiobookFinishCallback);
 }
 
 void AudiobookPlayer::fastForwardingTimerFunction()
@@ -144,7 +148,7 @@ void AudiobookPlayer::pauseToggle()
         fastForwardingSpeed_ = 0;
         if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
         changeStateTo(State::PLAYING);
-        pausedAudioTask_->seek(fastForwardedSeconds_);
+        pausedAudioTask_->seek(fastForwardedSeconds_ * 1000);
         fastForwardedSeconds_ = 0;
         play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("unpausing_audiobook") });
         currentAudioTask_->waitForEnd();
@@ -160,10 +164,12 @@ void AudiobookPlayer::pauseToggle()
         if (!currentAudioTask_) return;
         if (!currentAudioTask_->isPausable()) return;
         BOOST_LOG_TRIVIAL(info) << "Toggling audiotrack pause: " << audioTracks_[currentTrackIndex_].getTrackName();
+        audioTracks_[currentTrackIndex_].setLastPlayedMillisecond(currentAudioTask_->getCurrentTaskElementMilliseconds());
+        saveTracksInfo();
         fastForwardingSpeed_ = 0;
         if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
         changeStateTo(State::PAUSED);
-        currentAudioTask_->seek(fastForwardedSeconds_);
+        currentAudioTask_->seek(fastForwardedSeconds_ * 1000);
         fastForwardedSeconds_ = 0;
         if (currentAudioTask_) currentAudioTask_->pause();
         pausedAudioTask_ = currentAudioTask_;
@@ -202,6 +208,63 @@ void AudiobookPlayer::loadTracks()
         }
     }
     BOOST_LOG_TRIVIAL(info) << audioTracks_.size() << " audio tracks successfully loaded.";
+}
+
+void AudiobookPlayer::loadTracksInfo()
+{
+    std::ifstream inputFile("../data/audiobook_data.txt");
+    if (!inputFile.is_open())
+    {
+        BOOST_LOG_TRIVIAL(info) << "File audiobook_data.txt could not be opened.";
+    }
+    else
+    {
+        for (std::string line; std::getline(inputFile, line);)
+        {
+            if (std::regex_match(line, trackInfoPattern_))
+            {
+                std::istringstream iss(line);
+                std::vector<std::string> tokens {std::istream_iterator<std::string> {iss}, std::istream_iterator<std::string> {}};
+                audioTracksInfo_.push_back(AudioTrack(tokens[0], std::stoi(tokens[1])));
+            }
+        }
+
+        inputFile.close();
+    }
+}
+
+void AudiobookPlayer::saveTracksInfo()
+{
+    std::ofstream outputFile("../data/audiobook_data.txt", std::ofstream::out | std::ofstream::trunc);
+    if (!outputFile.is_open())
+    {
+        BOOST_LOG_TRIVIAL(info) << "File audiobook_data.txt could not be opened.";
+    }
+    else
+    {
+        for (AudioTrack audioTrack : audioTracks_)
+        {
+            outputFile << audioTrack.getTrackName() + " " + std::to_string(audioTrack.getLastPlayedMillisecond()) + "\n";
+        }
+
+        outputFile.close();
+    }
+}
+
+void AudiobookPlayer::synchronizeTracksInfo()
+{
+    for (AudioTrack & audioTrack : audioTracks_)
+    {
+        for (AudioTrack audioTrackInfo : audioTracksInfo_)
+        {
+            if (audioTrack.getTrackName() == audioTrackInfo.getTrackName())
+            {
+                audioTrack.setLastPlayedMillisecond(audioTrackInfo.getLastPlayedMillisecond());
+            }
+        }
+    }
+
+    saveTracksInfo();
 }
 
 void AudiobookPlayer::switchToNextAudiobook()
@@ -337,6 +400,7 @@ void AudiobookPlayer::stopAudiobook()
     if (currentAudioTask_) currentAudioTask_->stop();
     play( {voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook")} );
     BOOST_LOG_TRIVIAL(info) << "Audiobook stopped.";
+    saveTracksInfo();
     currentState_ = State::CHOOSING;
 }
 

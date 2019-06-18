@@ -4,7 +4,12 @@
 namespace Pdb
 {
 
-AudioTrack::AudioTrack(const std::string & filePath, const float volume, Type type) : filePath_(filePath), volume_(volume), type_(type)
+AudioTrack::AudioTrack(std::string trackName, int lastPlayedMillisecond) : trackName_(trackName), lastPlayedMillisecond_(lastPlayedMillisecond)
+{
+
+}
+
+AudioTrack::AudioTrack(const std::string & filePath, const float volume, Type type) : filePath_(filePath), volume_(volume), lastPlayedMillisecond_(0), type_(type)
 {
     std::string fileExtension = filePath.substr(filePath.length() - 3, 3);
     if (fileExtension == "mp3") format_ = Format::MP3;
@@ -22,7 +27,6 @@ AudioTrack::AudioTrack(const std::string & filePath, const float volume, Type ty
 
 AudioTrack::~AudioTrack()
 {
-
 }
 
 }
