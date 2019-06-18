@@ -40,8 +40,9 @@ public:
     void start(std::list<AudioTask::Element> taskElements, std::function<void()> callbackFunction = {});
     void stop();
     void pause();
-    void seek(int offsetInSeconds);
+    void seek(int offsetInMilliseconds);
     void waitForEnd();
+    int getCurrentTaskElementMilliseconds() const;
 
 private:
     enum class State { AVAILABLE, UNAVAILABLE };

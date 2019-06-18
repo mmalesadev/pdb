@@ -24,6 +24,8 @@ public:
 
     virtual void seek(int offsetInSeconds) = 0;
 
+    virtual int currentPositionInMilliseconds() = 0;
+
     void setPlayedAudioTrack(AudioTrack* playedAudioTrack) { playedAudioTrack_ = playedAudioTrack; }
 
     std::string getPlayedAudioTrackName() const {  if(playedAudioTrack_) return playedAudioTrack_->getTrackName(); else return std::string(""); }

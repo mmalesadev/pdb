@@ -42,7 +42,8 @@ void AudioStreamMp3::play()
     if (rtAudio_->isStreamOpen()) rtAudio_->closeStream();
     rtAudio_->openStream(&parameters_, NULL, RTAUDIO_SINT16,
         sampleRate_, &bufferFrames_, &playCb, (void*) this);
-
+    if (playedAudioTrack_->getLastPlayedMillisecond() > 0)
+        seek(playedAudioTrack_->getLastPlayedMillisecond());
     rtAudio_->startStream();
 }
 
@@ -61,6 +62,7 @@ void AudioStreamMp3::stop()
 
 void AudioStreamMp3::play(const AudioTrack& audioTrack)
 {
+    // TODO: Funkcja do wyrzucenia
     std::unique_lock<std::mutex> lock(mutex_);
     
     volume_ = audioTrack.getVolume();
@@ -82,6 +84,8 @@ void AudioStreamMp3::play(const AudioTrack& audioTrack)
         sampleRate_, &bufferFrames_, &playCb, (void*) this);
 
     rtAudio_->startStream();
+    if (audioTrack.getLastPlayedMillisecond() > 0)
+        seek(audioTrack.getLastPlayedMillisecond());
 }
 
 int AudioStreamMp3::playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, 
@@ -137,12 +141,18 @@ int AudioStreamMp3::playCallback(void *outputBuffer, void *inputBuffer, unsigned
     return 0;
 }
 
-void AudioStreamMp3::seek(int offsetInSeconds)
+int AudioStreamMp3::currentPositionInMilliseconds()
 {
-    off_t currentSample = mpg123_tell(mh_);
-    off_t sampleOffset = offsetInSeconds * rate_;
+    return ((double)(mpg123_tell(mh_)) / (double)(rate_)) * 1000;
+}
 
-    BOOST_LOG_TRIVIAL(info) << "Offset in seconds: " << offsetInSeconds << ". Current sample: " << currentSample << ". Changing stream position by: " << 
+void AudioStreamMp3::seek(int offsetInMilliseconds)
+{
+    float secondsOffset = (float)(offsetInMilliseconds) / 1000.0f;
+    off_t currentSample = mpg123_tell(mh_);
+    off_t sampleOffset = secondsOffset * rate_;
+
+    BOOST_LOG_TRIVIAL(info) << "Offset in seconds: " << secondsOffset << ". Current sample: " << currentSample << ". Changing stream position by: " << 
         sampleOffset << ". Set position to sample: " << currentSample + sampleOffset;
 
     mpg123_seek(mh_, currentSample + sampleOffset, SEEK_SET);

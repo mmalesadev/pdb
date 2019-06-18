@@ -16,7 +16,9 @@ public:
     int playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, 
         double streamTime, RtAudioStreamStatus status) override;
 
-    void seek(int offsetInSeconds) override;
+    int currentPositionInMilliseconds() override;
+
+    void seek(int offsetInMilliseconds) override;
 
 private:
     AudioFile<double> audioFile_;

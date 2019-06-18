@@ -6,6 +6,7 @@
 #include <atomic>
 #include <thread>
 #include <mutex>
+#include <regex>
 
 namespace Pdb
 {
@@ -35,6 +36,9 @@ public:
 
 private:
     void loadTracks();
+    void loadTracksInfo();
+    void saveTracksInfo();
+    void synchronizeTracksInfo();
     void play(std::list<AudioTask::Element> audioTaskElements, std::function<void()> callbackFunction = {});
 
     void fastForwardingTimerFunction();
@@ -44,6 +48,7 @@ private:
 
     int currentTrackIndex_;
     std::vector<AudioTrack> audioTracks_;
+    std::vector<AudioTrack> audioTracksInfo_;
     AudioTask* currentAudioTask_;
     AudioTask* pausedAudioTask_;
 
@@ -57,6 +62,7 @@ private:
     void changeStateTo(State destinationState)          { currentState_ = destinationState; }
 
     std::mutex mutex_;
+    std::regex trackInfoPattern_;
 };
 
 }

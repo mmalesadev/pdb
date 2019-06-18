@@ -17,8 +17,9 @@ public:
     void play(const AudioTrack& audioTrack) override;
     int playCallback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, 
         double streamTime, RtAudioStreamStatus status) override;
+    int currentPositionInMilliseconds() override;
 
-    void seek(int offsetInSeconds) override;
+    void seek(int offsetInMilliseconds) override;
 
 private:
     mpg123_handle * mh_;

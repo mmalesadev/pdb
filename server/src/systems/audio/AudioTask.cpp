@@ -79,13 +79,13 @@ void AudioTask::pause()
     if (currentStream && currentStream->isPausable()) currentStream->pauseToggle();
 }
 
-void AudioTask::seek(int offsetInSeconds)
+void AudioTask::seek(int offsetInMilliseconds)
 {
     std::unique_lock<std::mutex> lock(mutex_);
     if (state_ == State::AVAILABLE) return;
     auto taskElement = audioTaskElements_.front();
     AudioStream* currentStream = taskElement.getStream();
-    if (currentStream && currentStream->isPausable()) currentStream->seek(offsetInSeconds);
+    if (currentStream && currentStream->isPausable()) currentStream->seek(offsetInMilliseconds);
 }
 
 void AudioTask::waitForEnd()
@@ -111,6 +111,12 @@ void AudioTask::taskFunction()
     if(taskCallbackFunction_) taskCallbackFunction_();
     state_ = State::AVAILABLE;
     taskFinishedCondVar_.notify_all();
+}
+
+int AudioTask::getCurrentTaskElementMilliseconds() const
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    return audioTaskElements_.front().getStream()->currentPositionInMilliseconds();
 }
 
 }
