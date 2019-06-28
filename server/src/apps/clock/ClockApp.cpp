@@ -31,12 +31,12 @@ void ClockApp::synthesizeClockReadings()
             if (hour == 0)
             {
                 voiceManager_.synthesizeVoiceMessage("<speak>północ. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings", "time_0_0");
-                for (int minute = 1; minute < 59; ++minute)
+                for (int minute = 1; minute < 60; ++minute)
                     voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(minute) + " po północy. </speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings", "time_0_" + std::to_string(minute));
             }
             else
             {
-                for (int minute = 0; minute < 59; ++minute)
+                for (int minute = 0; minute < 60; ++minute)
                 {
                     if (minute < 10)
                         voiceManager_.synthesizeVoiceMessage("<speak>" + std::to_string(hour) + ":0" + std::to_string(minute) + "</speak>", "../data/synthesized_sounds/apps/clock/readings/pl/time_readings", "time_" + std::to_string(hour) + "_" + std::to_string(minute));
@@ -116,7 +116,7 @@ void ClockApp::appLoopFunction()
             if (inputManager_.isButtonPressed(InputManager::Button::KeyKpAdd)) audioManager_.increaseMasterVolume();
             if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) audioManager_.decreaseMasterVolume();
             if (inputManager_.isButtonPressed(InputManager::Button::KeyKpMultiply)) playCurrentDate();
-            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpSubtract)) playCurrentTime();
+            if (inputManager_.isButtonPressed(InputManager::Button::KeyKpDivide)) playCurrentTime();
         }
     }
 }

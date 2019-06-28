@@ -14,7 +14,7 @@ namespace Pdb
 
 AudiobookPlayer::AudiobookPlayer(AudioManager& audioManager, VoiceManager& voiceManager) 
     : audioManager_(audioManager), voiceManager_(voiceManager), fastForwardingSpeed_(0), currentAudioTask_(nullptr), pausedAudioTask_(nullptr),
-    trackInfoPattern_(std::string("^([0-9a-zA-Z_[:punct:]]+)([[:space:]])([0-9]|[1-9][0-9]*)$"))
+    trackInfoPattern_(std::string("^(.+)([[:space:]])([0-9]|[1-9][0-9]*)$"))
 {
     this->loadTracks();
     this->loadTracksInfo();
@@ -118,6 +118,8 @@ void AudiobookPlayer::playChosenAudiobook()
         std::lock_guard<std::mutex> lock(mutex_);
         if (currentState_ == State::PLAYING)
         {
+            audioTracks_[currentTrackIndex_].setLastPlayedMillisecond(0);
+            saveTracksInfo();
             changeStateTo(State::CHOOSING);
             BOOST_LOG_TRIVIAL(info) << "Finished playing audiotrack.";
             play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook") });
@@ -129,12 +131,32 @@ void AudiobookPlayer::playChosenAudiobook()
 void AudiobookPlayer::fastForwardingTimerFunction()
 {
     fastForwardedSeconds_ = 0;
+    //TODO: TO WCZYTUJE INFO z "REWINDING" a nie z AUDIO TRACK, wiec ZMIEN TOOOO
+    //JAK JEST REWINDING I INNE GOWNA TO MUSI SIE NADPISYWAC AUDIO_TRACK INFO KONIECZNIE!
+    // Z TEGO TEZ BIERZEMY TO INFO I DAJEMY TU NA DOLE (lastPlayedSecond)
+    int lastPlayedSecond = audioTracks_[currentTrackIndex_].getLastPlayedMillisecond() / 1000;
+    // TO BYLO WCZESNIEJ: int lastPlayedSecond = currentAudioTask_->getCurrentTaskElementMilliseconds() / 1000;
+
+
     while (fastForwardingSpeed_ != 0)
-    { 
+    {
+        //TODO: Czy tu moze byc problem? zobacz funkcje np. rewind
         auto sleepToTime = std::chrono::steady_clock::now() + std::chrono::seconds(1);
         fastForwardedSeconds_ += fastForwardingSpeed_;
         std::this_thread::sleep_until(sleepToTime);
-        BOOST_LOG_TRIVIAL(info) << "Fast-forwarded seconds: " << fastForwardedSeconds_;
+                
+        std::unique_lock<std::mutex> lock(mutex_);
+        BOOST_LOG_TRIVIAL(info) << "Fast-forwarded seconds: " << fastForwardedSeconds_ 
+            << ", last played second: " << lastPlayedSecond << ", difference " << (lastPlayedSecond + fastForwardedSeconds_);
+        //TODO: Skrajny przypadek gdy przewiniemy z 2xd o 0x ale tez bedzie koniec -> wtedy 2x razy sie wykona np. pauseToggle()
+        // if ((lastPlayedSecond + fastForwardedSeconds_) < 0)
+        // {
+        //     fastForwardingSpeed_ = 0;
+        //     changeStateTo(State::PLAYING);
+        //     currentAudioTask_->pauseToggle();
+        //     currentAudioTask_->seek(fastForwardedSeconds_ * 1000);
+        //     break;
+        // }
     }
 }
 
@@ -142,19 +164,28 @@ void AudiobookPlayer::pauseToggle()
 {
     if (currentState_ == State::PAUSED || currentState_ == State::FAST_FORWARDING || currentState_ == State::REWINDING)
     {
-        if (!pausedAudioTask_) return;
-        if (!pausedAudioTask_->isPausable()) return;
+        if (!pausedAudioTask_)
+        {
+            BOOST_LOG_TRIVIAL(info) << "No paused audio task!";
+            return;
+        }
+        if (!pausedAudioTask_->isPausable())
+        {
+            BOOST_LOG_TRIVIAL(info) << "Audio task not pausable! ";
+            return;
+        }
         BOOST_LOG_TRIVIAL(info) << "Toggling audiotrack pause: " << audioTracks_[currentTrackIndex_].getTrackName();
         fastForwardingSpeed_ = 0;
         if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
         changeStateTo(State::PLAYING);
         pausedAudioTask_->seek(fastForwardedSeconds_ * 1000);
+        updateCurrentTrackInfo(pausedAudioTask_);
         fastForwardedSeconds_ = 0;
         play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("unpausing_audiobook") });
         currentAudioTask_->waitForEnd();
         if (pausedAudioTask_)
         {
-            pausedAudioTask_->pause();
+            pausedAudioTask_->pauseToggle();
             currentAudioTask_ = pausedAudioTask_;
         }
         pausedAudioTask_ = nullptr;
@@ -170,8 +201,9 @@ void AudiobookPlayer::pauseToggle()
         if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
         changeStateTo(State::PAUSED);
         currentAudioTask_->seek(fastForwardedSeconds_ * 1000);
+        updateCurrentTrackInfo(currentAudioTask_);
         fastForwardedSeconds_ = 0;
-        if (currentAudioTask_) currentAudioTask_->pause();
+        if (currentAudioTask_) currentAudioTask_->pauseToggle();
         pausedAudioTask_ = currentAudioTask_;
         play({ voiceManager_.getSynthesizedVoiceAudioTracks().at("pausing_audiobook") });
     }
@@ -216,16 +248,19 @@ void AudiobookPlayer::loadTracksInfo()
     if (!inputFile.is_open())
     {
         BOOST_LOG_TRIVIAL(info) << "File audiobook_data.txt could not be opened.";
+        exit(0);
     }
     else
     {
         for (std::string line; std::getline(inputFile, line);)
         {
+            BOOST_LOG_TRIVIAL(info) << line;
             if (std::regex_match(line, trackInfoPattern_))
             {
                 std::istringstream iss(line);
                 std::vector<std::string> tokens {std::istream_iterator<std::string> {iss}, std::istream_iterator<std::string> {}};
                 audioTracksInfo_.push_back(AudioTrack(tokens[0], std::stoi(tokens[1])));
+                BOOST_LOG_TRIVIAL(info) << "Added audio track info: " << tokens[0] << ", " << tokens[1];
             }
         }
 
@@ -267,6 +302,12 @@ void AudiobookPlayer::synchronizeTracksInfo()
     saveTracksInfo();
 }
 
+void AudiobookPlayer::updateCurrentTrackInfo(AudioTask* audioTask)
+{
+    audioTracks_[currentTrackIndex_].setLastPlayedMillisecond(audioTask->getCurrentTaskElementMilliseconds());
+    saveTracksInfo();
+}
+
 void AudiobookPlayer::switchToNextAudiobook()
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -303,29 +344,40 @@ std::vector< std::pair<InputManager::Button, std::function<void()> > > & Audiobo
 void AudiobookPlayer::rewind()
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    AudioTask* checkedAudioTask = nullptr;
-    if (currentState_ == State::PLAYING) checkedAudioTask = currentAudioTask_;
-    else if (currentState_ == State::PAUSED) checkedAudioTask = pausedAudioTask_;
 
     if (fastForwardingSpeed_ == 0)
     {
+        AudioTask* checkedAudioTask = nullptr;
+        if (currentState_ == State::PLAYING) checkedAudioTask = currentAudioTask_;
+        else if (currentState_ == State::PAUSED) checkedAudioTask = pausedAudioTask_;
+
         if (!checkedAudioTask) return;
         if (!checkedAudioTask->isPausable()) return;
-        pausedAudioTask_ = currentAudioTask_;
         if (!checkedAudioTask->isPaused())
         {
-            pausedAudioTask_ = currentAudioTask_;checkedAudioTask->pause();
+            pausedAudioTask_ = currentAudioTask_;
+            checkedAudioTask->pauseToggle();
+            updateCurrentTrackInfo(checkedAudioTask);
         }
         fastForwardingSpeed_ = -2;
         changeStateTo(State::REWINDING);
-        if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
+        lock.unlock();
+        if (fastForwardingTimerThread_.joinable())
+            fastForwardingTimerThread_.join();
+        lock.lock();
         fastForwardingTimerThread_ = std::thread(&AudiobookPlayer::fastForwardingTimerFunction, this);
     }
     else if (fastForwardingSpeed_ == 2)
     {
         fastForwardingSpeed_ = 0;
+        lock.unlock();
+        if (fastForwardingTimerThread_.joinable())
+            fastForwardingTimerThread_.join();
+        lock.lock();
         currentAudioTask_ = pausedAudioTask_;
-        currentAudioTask_->pause();
+        currentAudioTask_->seek(fastForwardedSeconds_ * 1000);
+        currentAudioTask_->pauseToggle();
+        updateCurrentTrackInfo(currentAudioTask_);
         changeStateTo(State::PLAYING);
     }
     else if (fastForwardingSpeed_ < 0) fastForwardingSpeed_ *= 2;
@@ -342,37 +394,50 @@ void AudiobookPlayer::rewind()
     }
     else if (fastForwardingSpeed_ != 0)
     {
+        if (currentAudioTask_) currentAudioTask_->stop();
         play({ voiceManager_.getSynthesizedVoiceAudioTracks().at(std::to_string(std::abs(fastForwardingSpeed_)) + "x") });
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Set fast-forwardings speed to " << fastForwardingSpeed_;
+    BOOST_LOG_TRIVIAL(info) << "Set fast-forwarding speed to " << fastForwardingSpeed_;
 }
+
 void AudiobookPlayer::fastForward()
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    AudioTask* checkedAudioTask = nullptr;
-    if (currentState_ == State::PLAYING) checkedAudioTask = currentAudioTask_;
-    else if (currentState_ == State::PAUSED) checkedAudioTask = pausedAudioTask_;
 
     if (fastForwardingSpeed_ == 0)
     {
+        AudioTask* checkedAudioTask = nullptr;
+        if (currentState_ == State::PLAYING) checkedAudioTask = currentAudioTask_;
+        else if (currentState_ == State::PAUSED) checkedAudioTask = pausedAudioTask_;
+
         if (!checkedAudioTask) return;
         if (!checkedAudioTask->isPausable()) return;
         if (!checkedAudioTask->isPaused())
         {
             pausedAudioTask_ = currentAudioTask_;
-            checkedAudioTask->pause();
+            checkedAudioTask->pauseToggle();
+            updateCurrentTrackInfo(checkedAudioTask);
         }
         fastForwardingSpeed_ = 2;
         changeStateTo(State::FAST_FORWARDING);
-        if (fastForwardingTimerThread_.joinable()) fastForwardingTimerThread_.join();
+        lock.unlock();
+        if (fastForwardingTimerThread_.joinable())
+            fastForwardingTimerThread_.join();
+        lock.lock();
         fastForwardingTimerThread_ = std::thread(&AudiobookPlayer::fastForwardingTimerFunction, this);
     }
     else if (fastForwardingSpeed_ == -2)
     {
         fastForwardingSpeed_ = 0;
+        lock.unlock();
+        if (fastForwardingTimerThread_.joinable())
+            fastForwardingTimerThread_.join();
+        lock.lock();
         currentAudioTask_ = pausedAudioTask_;
-        currentAudioTask_->pause();
+        pausedAudioTask_->seek(fastForwardedSeconds_ * 1000);
+        currentAudioTask_->pauseToggle();
+        updateCurrentTrackInfo(currentAudioTask_);
         changeStateTo(State::PLAYING);
     }
     else if (fastForwardingSpeed_ < 0) fastForwardingSpeed_ *= 0.5f;
@@ -389,24 +454,30 @@ void AudiobookPlayer::fastForward()
     }
     else if (fastForwardingSpeed_ != 0)
     {
+        if (currentAudioTask_) currentAudioTask_->stop();
         play({ voiceManager_.getSynthesizedVoiceAudioTracks().at(std::to_string(std::abs(fastForwardingSpeed_)) + "x") });
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Set fast-forwardings speed to " << fastForwardingSpeed_;
+    BOOST_LOG_TRIVIAL(info) << "Set fast-forwarding speed to " << fastForwardingSpeed_;
 }
+
 void AudiobookPlayer::stopAudiobook()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (currentAudioTask_) currentAudioTask_->stop();
+    
+    if (currentAudioTask_)
+    {
+        updateCurrentTrackInfo(currentAudioTask_);
+        currentAudioTask_->stop();
+    }
     play( {voiceManager_.getSynthesizedVoiceAudioTracks().at("stopping_audiobook")} );
     BOOST_LOG_TRIVIAL(info) << "Audiobook stopped.";
-    saveTracksInfo();
     currentState_ = State::CHOOSING;
 }
 
 void AudiobookPlayer::printState()
 {
-    BOOST_LOG_TRIVIAL(info) << static_cast<std::underlying_type<State>::type>(currentState_);
+    BOOST_LOG_TRIVIAL(info) << "State: " << stateNames_[static_cast<std::underlying_type<State>::type>(currentState_)];
 }
 
 }

@@ -39,9 +39,12 @@ private:
     void loadTracksInfo();
     void saveTracksInfo();
     void synchronizeTracksInfo();
+    void updateCurrentTrackInfo(AudioTask* audioTask);
     void play(std::list<AudioTask::Element> audioTaskElements, std::function<void()> callbackFunction = {});
 
     void fastForwardingTimerFunction();
+
+    void changeStateTo(State destinationState)          { currentState_ = destinationState; }
 
     AudioManager& audioManager_;
     VoiceManager& voiceManager_;
@@ -59,7 +62,7 @@ private:
     std::unordered_map<State, std::vector< std::pair<InputManager::Button, std::function<void()> > > > availableActions_;
 
     State currentState_;
-    void changeStateTo(State destinationState)          { currentState_ = destinationState; }
+    std::vector<std::string> stateNames_ = {"choosing", "playing", "rewinding", "fast_forwarding", "paused"};
 
     std::mutex mutex_;
     std::regex trackInfoPattern_;

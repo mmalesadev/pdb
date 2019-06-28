@@ -69,7 +69,6 @@ void AudiobookApp::appLoopFunction()
         {
             audiobookPlayer_.printState();
             audioManager_.printAllStreamsInfo();
-            BOOST_LOG_TRIVIAL(info) << availableActions.size();
         }
     }
 

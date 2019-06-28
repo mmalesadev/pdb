@@ -51,13 +51,13 @@ void AudioStreamMp3::stop()
 {
     std::unique_lock<std::mutex> lock(mutex_);
 
-    BOOST_LOG_TRIVIAL(info) << "Stopping mp3 audio stream. open: " << rtAudio_->isStreamOpen() << ", running: " << rtAudio_->isStreamRunning();
+    BOOST_LOG_TRIVIAL(info) << "Stopping mp3 audio stream: " << playedAudioTrack_->getTrackName() << ", open: " << rtAudio_->isStreamOpen() << ", running: " << rtAudio_->isStreamRunning();
     rtAudio_->closeStream();
     mpg123_close(mh_);
     doneDecodingMp3_ = false;
     state_ = State::AVAILABLE;
     finishedPlayingCondVar_.notify_all();
-    BOOST_LOG_TRIVIAL(info) << "Stopped mp3 audio stream. open: " << rtAudio_->isStreamOpen() << ", running: " << rtAudio_->isStreamRunning();
+    BOOST_LOG_TRIVIAL(info) << "Stopped mp3 audio stream: " << playedAudioTrack_->getTrackName() << ", open: " << rtAudio_->isStreamOpen() << ", running: " << rtAudio_->isStreamRunning();
 }
 
 void AudioStreamMp3::play(const AudioTrack& audioTrack)

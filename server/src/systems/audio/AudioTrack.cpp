@@ -22,7 +22,7 @@ AudioTrack::AudioTrack(const std::string & filePath, const float volume, Type ty
     size_t lastSlashIndex = filePath.find_last_of("/\\");
     std::string fileName = filePath.substr(lastSlashIndex + 1);
     trackName_ = fileName.substr(0, fileName.length() - 4);
-    BOOST_LOG_TRIVIAL(info) << "Audio track created: " << trackName_ << ", volume: " << volume_;
+    BOOST_LOG_TRIVIAL(debug) << "Audio track created: " << trackName_ << ", volume: " << volume_;
 }
 
 AudioTrack::~AudioTrack()
