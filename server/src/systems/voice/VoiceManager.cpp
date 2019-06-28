@@ -26,7 +26,6 @@ void VoiceManager::synthesizeVoiceMessage(const std::string& message, const std:
     boost::filesystem::path synthesizedVoiceMessageFilePath(outputDirectory + "/" + outputTrackName + ".mp3");
     if (boost::filesystem::exists(synthesizedVoiceMessageFilePath))
     {
-        BOOST_LOG_TRIVIAL(info) << "Voice message already synthesized (" << synthesizedVoiceMessageFilePath << ").";
         synthesizedVoiceAudioTracks_.insert(std::make_pair(outputTrackName, AudioTrack(synthesizedVoiceMessageFilePath.c_str(), Config::getInstance().volumeForAwsSynthesized, AudioTrack::Type::VOICE_MESSAGE)));
         return;
     }

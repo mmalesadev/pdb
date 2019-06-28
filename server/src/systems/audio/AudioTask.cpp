@@ -40,14 +40,11 @@ void AudioTask::stop()
     std::unique_lock<std::mutex> lock(mutex_);
     if (state_ == State::AVAILABLE) return;
     taskCallbackFunction_ = {};
-    auto taskElement = audioTaskElements_.front();
-    AudioStream* currentStream = taskElement.getStream();
     for (auto& audioTaskElement : audioTaskElements_)
     {
         audioTaskElement.getStream()->stop();
     }
     audioTaskElements_.clear();
-    if (currentStream) currentStream->stop();
 }
 
 bool AudioTask::isPausable() const
@@ -70,7 +67,7 @@ bool AudioTask::isPaused() const
     return false;
 }
 
-void AudioTask::pause()
+void AudioTask::pauseToggle()
 {
     std::unique_lock<std::mutex> lock(mutex_);
     if (state_ == State::AVAILABLE) return;
@@ -117,6 +114,12 @@ int AudioTask::getCurrentTaskElementMilliseconds() const
 {
     std::unique_lock<std::mutex> lock(mutex_);
     return audioTaskElements_.front().getStream()->currentPositionInMilliseconds();
+}
+
+void AudioTask::printDebugInfo() const
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    BOOST_LOG_TRIVIAL(info) << "Current audio task track name: " << audioTaskElements_.front().getStream()->getPlayedAudioTrackName();
 }
 
 }

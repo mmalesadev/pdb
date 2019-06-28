@@ -39,10 +39,11 @@ public:
     bool isPaused() const;
     void start(std::list<AudioTask::Element> taskElements, std::function<void()> callbackFunction = {});
     void stop();
-    void pause();
+    void pauseToggle();
     void seek(int offsetInMilliseconds);
     void waitForEnd();
     int getCurrentTaskElementMilliseconds() const;
+    void printDebugInfo() const;
 
 private:
     enum class State { AVAILABLE, UNAVAILABLE };

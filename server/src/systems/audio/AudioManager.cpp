@@ -77,7 +77,7 @@ int AudioManager::getFreeMp3AudioStreamCount() const
 
 void AudioManager::increaseMasterVolume()
 {
-    if (masterVolume_ <= 0.9f)
+    if (masterVolume_ <= 1.9f)
         masterVolume_.store(masterVolume_ + 0.1f);
 }
 
